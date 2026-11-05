@@ -1,0 +1,833 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#6c4cf1">
+<title>Times Tables Trainer</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{
+  --bg:#f4f1ff; --card:#ffffff; --ink:#1f1b3a; --muted:#6b6790; --accent:#6c4cf1; --accent-ink:#ffffff;
+  --good:#1fa363; --bad:#e04848; --warn:#f2a632; --line:#e3def7; --key:#efeafe; --key-ink:#1f1b3a; --grey:#dedbea;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#15132a; --card:#211e3d; --ink:#f2f0ff; --muted:#a7a3c9; --line:#34305a; --key:#2e2a52; --key-ink:#f2f0ff; --grey:#3a3660; }
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  -webkit-user-select:none;user-select:none;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;cursor:pointer}
+.screen{display:none;padding:20px 16px 40px;max-width:1100px;margin:0 auto}
+.screen.active{display:block}
+h1{font-size:clamp(1.6rem,4vw,2.3rem);margin:.2em 0}
+h2{font-size:1.25rem;margin:0 0 .6em}
+h3{font-size:1.05rem;margin:1.2em 0 .5em}
+.muted{color:var(--muted)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ghost{background:var(--card);border:2px solid var(--line);border-radius:12px;padding:8px 14px;font-size:1.1rem}
+.link{background:none;border:none;color:var(--muted);text-decoration:underline;padding:10px 0;margin-top:10px}
+
+/* home */
+.modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin:18px 0}
+.mode{background:var(--card);border:2px solid var(--line);border-radius:20px;padding:20px;text-align:left;display:flex;flex-direction:column;gap:6px;
+  box-shadow:0 4px 0 var(--line);transition:transform .08s}
+.mode:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
+.mode .emoji{font-size:2.4rem}
+.mode b{font-size:1.35rem}
+.mode small{color:var(--muted);font-size:.95rem;line-height:1.35}
+.mode.main{border-color:var(--accent)}
+.records{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.rec{background:var(--key);border-radius:14px;padding:12px 14px}
+.rec small{display:block;color:var(--muted)}
+.rec b{font-size:1.8rem}
+.panel{background:var(--card);border:2px solid var(--line);border-radius:20px;padding:18px;margin-top:14px}
+.stars{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px}
+.starchip{background:var(--grey);border-radius:999px;padding:5px 11px;font-weight:600;color:var(--muted)}
+.starchip.on{background:#ffe9a8;color:#6a4a00}
+#grid{display:grid;grid-template-columns:repeat(12,1fr);gap:3px;max-width:560px;margin-top:10px}
+.cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:clamp(9px,1.7vw,14px);border-radius:5px;font-weight:600}
+.cell.head{background:transparent;color:var(--muted);font-weight:800}
+.cell.new{background:var(--grey);color:var(--muted)}
+.cell.struggling{background:#f7c3c3;color:#7a1d1d}
+.cell.learning{background:#fbe1a0;color:#6a4a00}
+.cell.mastered{background:#a6e5c1;color:#0d5a33}
+.legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:10px;font-size:.9rem;color:var(--muted)}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:4px}
+.bars{display:flex;align-items:flex-end;gap:8px;height:120px;margin-top:8px}
+.bar{flex:0 0 34px;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px}
+.bar div{width:100%;background:var(--accent);border-radius:6px 6px 2px 2px;min-height:3px}
+.bar span{font-size:.8rem;color:var(--muted)}
+
+/* tables & levels */
+.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px;margin-top:16px}
+.tbtn,.lbtn{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:4px;align-items:center;box-shadow:0 4px 0 var(--line)}
+.tbtn b{font-size:2rem}
+.tbtn small,.lbtn small{color:var(--muted)}
+.tbtn.star{border-color:#f2c94c;background:linear-gradient(var(--card),#fff4d1)}
+@media (prefers-color-scheme: dark){ .tbtn.star{background:linear-gradient(var(--card),#4a3f1c)} }
+.llist{display:grid;gap:12px;margin-top:16px;max-width:560px}
+.lbtn{align-items:flex-start;text-align:left}
+.lbtn b{font-size:1.25rem}
+.lbtn:disabled{opacity:.45;cursor:default}
+
+/* play */
+.playtop{display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:700}
+#progress{color:var(--muted);min-width:60px;text-align:right}
+.timer{height:16px;background:var(--grey);border-radius:999px;overflow:hidden;margin:16px 0}
+#timerBar{height:100%;width:100%;background:var(--accent);border-radius:999px}
+#timerBar.mid{background:var(--warn)}
+#timerBar.low{background:var(--bad)}
+.playbody{display:flex;flex-direction:column;align-items:center;gap:18px}
+.qside{text-align:center;width:100%}
+.q{font-size:clamp(3rem,11vw,6.5rem);font-weight:800;letter-spacing:.02em;min-height:1.2em;font-variant-numeric:tabular-nums}
+.answer{display:inline-block;min-width:3.2em;font-size:clamp(2.6rem,9vw,5rem);font-weight:800;padding:.05em .3em;border:4px solid var(--accent);
+  border-radius:18px;background:var(--card);min-height:1.35em;font-variant-numeric:tabular-nums}
+.answer.wrong{border-color:var(--bad);color:var(--bad)}
+.feedback{min-height:2.2em;font-size:clamp(1.2rem,3.5vw,1.8rem);font-weight:700;margin-top:12px}
+.feedback.good{color:var(--good)}
+.feedback.bad{color:var(--bad)}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:380px}
+.pad button{height:clamp(62px,9vh,84px);font-size:2rem;font-weight:700;border:none;border-radius:16px;background:var(--key);color:var(--key-ink);
+  box-shadow:0 4px 0 var(--line)}
+.pad button.down{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
+.pad button.ok{background:var(--good);color:#fff;box-shadow:0 4px 0 #157a49}
+.pad button.del{font-size:1.6rem}
+.pad button.ok{font-size:1.4rem}
+#timeLeft{display:none}
+
+/* Mock Check: looks like the official Multiplication Tables Check screen */
+body.exam{background:#fff;color:#0b0c0c}
+.exam #play{font-family:Arial,"Helvetica Neue",Helvetica,sans-serif;color:#0b0c0c}
+.exam #play .ghost{background:#fff;border-color:#b1b4b6;color:#0b0c0c}
+.exam #playTitle{font-weight:400}
+.exam #timeLeft{display:inline;font-size:1.2rem;font-weight:400}
+.exam #timeLeft b{font-weight:700}
+.exam #progress{display:none}
+.exam .timer{visibility:hidden!important}
+.exam .playbody{display:grid;grid-template-columns:auto auto;justify-content:center;align-items:start;column-gap:0;row-gap:10px;margin-top:35px}
+.exam .qside{display:contents}
+.exam .q{grid-column:1;grid-row:1;font-size:59px;font-weight:400;line-height:100px;letter-spacing:0;text-align:right;padding-right:10px;min-height:100px}
+.exam .answer{grid-column:2;grid-row:1;display:block;width:320px;height:100px;margin:0 10px;font-size:59px;font-weight:400;line-height:96px;
+  text-align:right;padding:0 12px;border:2px solid #0b0c0c;border-radius:0;box-shadow:0 0 0 3px #ffbf47;background:#fff;color:#0b0c0c}
+.exam .answer.wrong{border-color:#0b0c0c;color:#0b0c0c}
+.exam .feedback{display:none}
+.exam .pad{grid-column:2;grid-row:2;grid-template-columns:repeat(3,100px);gap:6px;width:auto;max-width:none;justify-content:center;margin:0 10px}
+.exam .pad button,.exam .pad button.ok{height:70px;border-radius:0;background:#6f777b;color:#fff;font-size:36px;font-weight:400;box-shadow:0 2px 0 #383f43}
+.exam .pad button.ok,.exam .pad button.del{font-size:28px}
+.exam .pad button.down{box-shadow:none;transform:translateY(2px)}
+#practiceBadge,#loadingMsg{display:none}
+.exam #playTitle{visibility:hidden}
+.exam #quitBtn{font-size:.85rem;padding:4px 10px;opacity:.6}
+.exam.practice #practiceBadge{display:inline-block;background:#6f777b;color:#fff;text-transform:uppercase;padding:2px 5px;font-size:1.2rem;margin-right:auto;margin-left:12px}
+.exam.loading #loadingMsg{display:block;text-align:center;font-size:36px;margin-top:120px}
+.exam.loading .playbody,.exam.loading #timeLeft{display:none}
+.exam.loading #playTitle{display:none}
+#examInfo{padding:0;max-width:none;background:#fff;color:#0b0c0c;font-family:Arial,"Helvetica Neue",Helvetica,sans-serif;min-height:100vh}
+.xhead{background:#0b0c0c;color:#fff;padding:12px 24px;font-size:24px;font-weight:700;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.xpractice{font-size:16px;font-weight:400;opacity:.8}
+.xbar{height:10px;background:#005ea5}
+.xmain{max-width:960px;margin:0 auto;padding:20px 24px 40px}
+.xmain h1{font-size:48px;line-height:1.05;margin:30px 0 20px}
+.xmain h2{font-size:24px;margin:10px 0 15px}
+.xmain ul{font-size:19px;line-height:1.6;padding-left:20px}
+.xmain .lede{font-size:24px;margin:0 0 30px}
+.xback{background:none;border:none;padding:0 0 0 14px;font-size:16px;color:#0b0c0c;text-decoration:underline;position:relative;margin-top:15px}
+.xback:before{content:"";position:absolute;left:0;top:50%;margin-top:-6px;border:6px solid transparent;border-right:8px solid #0b0c0c;border-left:0}
+.xbtn{background:#00823b;color:#fff;border:none;border-radius:0;box-shadow:0 2px 0 #003618;font-size:24px;font-weight:700;padding:10px 20px;margin-top:10px;
+  display:inline-flex;align-items:center;gap:12px}
+.xbtn.start:after{content:"";border:9px solid transparent;border-left:12px solid #fff;border-right:0}
+.xbtn:active{transform:translateY(2px);box-shadow:none}
+.xquit{background:none;border:none;padding:0;margin-top:50px;color:#6f777b;text-decoration:underline;font-size:16px}
+@media (max-width:640px){
+  .exam .playbody{grid-template-columns:auto}
+  .exam .q{grid-column:1;grid-row:1;text-align:center;padding:0;font-size:46px}
+  .exam .answer{grid-column:1;grid-row:2;width:auto;max-width:320px;margin:0 auto;font-size:46px}
+  .exam .pad{grid-column:1;grid-row:3}
+}
+@media (min-width:820px) and (orientation:landscape){
+  .playbody{display:grid;grid-template-columns:1fr 380px;align-items:center;margin-top:30px}
+}
+
+/* results */
+.res{text-align:center;max-width:720px;margin:0 auto}
+.bigscore{font-size:clamp(3.5rem,12vw,6rem);font-weight:800;color:var(--accent);margin:.1em 0}
+.chips{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.chip{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:8px 14px;display:flex;flex-direction:column}
+.chip b{font-size:1.25rem}
+.chip small{color:var(--muted)}
+.btnrow{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:26px}
+.btn{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:14px 22px;font-size:1.15rem;font-weight:700}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+
+/* confetti */
+.confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:10}
+.confetti span{position:absolute;top:-50px;animation:fall 2.6s ease-in forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(540deg)}}
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<section id="home" class="screen active">
+  <div class="top">
+    <h1>✖️ Times Tables Trainer</h1>
+    <button id="soundBtn" class="ghost" aria-label="Sound on or off">🔊</button>
+  </div>
+  <div class="modes">
+    <button class="mode" data-go="tables"><span class="emoji">📚</span><b>Learn a Table</b>
+      <small>Pick a times table and master it level by level. Earn a ⭐ for each one.</small></button>
+    <button class="mode" data-go="tricky"><span class="emoji">🎯</span><b>Tricky Facts</b>
+      <small>Practise the facts you find hardest. The game remembers which ones they are.</small></button>
+    <button class="mode main" data-go="mock"><span class="emoji">⏱️</span><b>Mock Check</b>
+      <small>Just like the real test: 25 questions, 6 seconds each, no help.</small></button>
+  </div>
+  <h2>🎮 Games</h2>
+  <div class="modes">
+    <button class="mode" data-go="clock"><span class="emoji">⚡</span><b>Beat the Clock</b>
+      <small>How many can you get right in 60 seconds? Try to beat your record!</small></button>
+    <button class="mode" data-go="streak"><span class="emoji">🔥</span><b>Streak</b>
+      <small>Keep going until you get one wrong. 6 seconds each. How long can your streak be?</small></button>
+  </div>
+  <div class="panel">
+    <h2>My progress</h2>
+    <div id="summary"></div>
+    <div id="grid"></div>
+    <div class="legend">
+      <span><i style="background:var(--grey)"></i>Not tried yet</span>
+      <span><i style="background:#f7c3c3"></i>Needs practice</span>
+      <span><i style="background:#fbe1a0"></i>Learning</span>
+      <span><i style="background:#a6e5c1"></i>Mastered</span>
+    </div>
+  </div>
+  <div class="panel">
+    <h2>🏆 My records</h2>
+    <div id="records" class="records"></div>
+    <h3>Mock check scores</h3>
+    <div id="history"></div>
+  </div>
+  <div class="panel">
+    <h2>💾 Backup</h2>
+    <p class="muted">Progress is saved on this device only. Save a backup file to keep it safe, or to move it to a new address or device.</p>
+    <div class="btnrow" style="justify-content:flex-start;margin-top:10px">
+      <button id="backupBtn" class="btn primary">⬇️ Save backup</button>
+      <button id="restoreBtn" class="btn">⬆️ Restore from backup</button>
+      <input id="restoreFile" type="file" accept=".json,application/json" hidden>
+    </div>
+    <p id="backupMsg" class="muted" style="min-height:1.2em"></p>
+  </div>
+  <button id="resetBtn" class="link">Reset all progress</button>
+</section>
+
+<!-- PICK A TABLE -->
+<section id="tables" class="screen">
+  <div class="top"><h1>📚 Pick a table</h1><button class="ghost" data-home>🏠 Home</button></div>
+  <p class="muted">Pass all 4 levels to earn a star. Tip: start with 2, 5 and 10, and save 7 and 12 for last.</p>
+  <div id="tableGrid" class="tgrid"></div>
+</section>
+
+<!-- PICK A LEVEL -->
+<section id="levels" class="screen">
+  <div class="top"><h1 id="levelTitle"></h1><button class="ghost" id="backTables">◀ Back</button></div>
+  <div id="levelList" class="llist"></div>
+</section>
+
+<!-- MOCK CHECK INFO PAGES (styled like the official check) -->
+<section id="examInfo" class="screen">
+  <div class="xhead"><span>Multiplication Tables Check</span><span class="xpractice">Practice at home</span></div>
+  <div class="xbar"></div>
+  <div class="xmain">
+    <button class="xback" id="xBack" type="button">Back</button>
+    <div id="xBody"></div>
+    <button class="xbtn" id="xNext" type="button"></button>
+    <p><button class="xquit" data-home type="button">Leave the mock check</button></p>
+  </div>
+</section>
+
+<!-- PLAY -->
+<section id="play" class="screen">
+  <div class="playtop">
+    <button id="quitBtn" class="ghost">✕ Stop</button>
+    <span id="practiceBadge">practice</span>
+    <span id="playTitle"></span>
+    <span id="timeLeft">Time left: <b id="timeLeftN"></b></span>
+    <span id="progress"></span>
+  </div>
+  <div class="timer" id="timerWrap"><div id="timerBar"></div></div>
+  <p id="loadingMsg"></p>
+  <div class="playbody">
+    <div class="qside">
+      <div id="qtext" class="q"></div>
+      <div id="answer" class="answer"></div>
+      <div id="feedback" class="feedback"></div>
+    </div>
+    <div class="pad" id="pad">
+      <button data-k="1">1</button><button data-k="2">2</button><button data-k="3">3</button>
+      <button data-k="4">4</button><button data-k="5">5</button><button data-k="6">6</button>
+      <button data-k="7">7</button><button data-k="8">8</button><button data-k="9">9</button>
+      <button data-k="del" class="del" aria-label="Delete">⌫</button><button data-k="0">0</button><button data-k="ok" class="ok" aria-label="Enter">Enter</button>
+    </div>
+  </div>
+</section>
+
+<!-- RESULTS -->
+<section id="results" class="screen">
+  <div class="res">
+    <h1 id="resTitle"></h1>
+    <div id="resScore" class="bigscore"></div>
+    <p id="resMsg" style="font-size:1.2rem"></p>
+    <div id="resList"></div>
+    <div id="resButtons" class="btnrow"></div>
+  </div>
+</section>
+
+<script>
+(function(){
+"use strict";
+const $ = s => document.querySelector(s);
+const HARD = new Set([6, 7, 8, 9, 12]);
+const STORE = "ttt-v1";
+
+/* ---------- saved progress (kept on this tablet) ---------- */
+function blank(){ return { facts:{}, tables:{}, mock:{ best:null, history:[] }, clock:{ best:0, history:[] }, streak:{ best:0 }, sound:true }; }
+function load(){
+  try { const d = JSON.parse(localStorage.getItem(STORE) || "null"); if (d && d.facts) return Object.assign(blank(), d); } catch(e){}
+  return blank();
+}
+let data = load();
+function save(){ try { localStorage.setItem(STORE, JSON.stringify(data)); } catch(e){} }
+
+const fkey = (a,b) => a <= b ? a + "x" + b : b + "x" + a;   // 7x8 and 8x7 are the same fact
+function getFact(a,b){
+  const k = fkey(a,b);
+  if (!data.facts[k]) data.facts[k] = { seen:0, correct:0, streak:0, last:null, times:[] };
+  return data.facts[k];
+}
+function record(a,b,ok,ms){
+  const f = getFact(a,b);
+  f.seen++; f.last = ok ? 1 : 0;
+  if (ok){ f.correct++; if (ms <= 6000) f.streak++; } else f.streak = 0;
+  f.times.push(Math.round(ms)); if (f.times.length > 5) f.times.shift();
+}
+function status(a,b){
+  const f = data.facts[fkey(a,b)];
+  if (!f || !f.seen) return "new";
+  if (f.streak >= 3) return "mastered";
+  if (f.last === 0) return "struggling";
+  return "learning";
+}
+function tableInfo(t){ return data.tables[t] || (data.tables[t] = { level:1, star:false }); }
+
+/* ---------- helpers ---------- */
+function shuffle(arr){ for (let i = arr.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; }
+const orient = (a,b) => Math.random() < .5 ? { a, b } : { a:b, b:a };
+function allPairs(){ const p = []; for (let a = 2; a <= 12; a++) for (let b = a; b <= 12; b++) p.push([a,b]); return p; }
+function weightedPick(items, weights, n){
+  const it = items.slice(), w = weights.slice(), out = [];
+  while (out.length < n && it.length){
+    const tot = w.reduce((s,x) => s + x, 0);
+    let r = Math.random() * tot, i = 0;
+    while (i < w.length - 1 && r >= w[i]){ r -= w[i]; i++; }
+    out.push(it[i]); it.splice(i,1); w.splice(i,1);
+  }
+  return out;
+}
+const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+function show(id){ if (id !== "play") document.body.classList.remove("exam", "practice", "loading"); document.querySelectorAll(".screen").forEach(s => s.classList.toggle("active", s.id === id)); window.scrollTo(0,0); }
+
+/* ---------- sound & confetti ---------- */
+let actx = null;
+function tone(freqs){
+  if (!data.sound) return;
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const t0 = actx.currentTime;
+    freqs.forEach((f,i) => {
+      const o = actx.createOscillator(), g = actx.createGain(), t = t0 + i * .1;
+      o.type = "sine"; o.frequency.value = f;
+      g.gain.setValueAtTime(.0001, t);
+      g.gain.exponentialRampToValueAtTime(.25, t + .015);
+      g.gain.exponentialRampToValueAtTime(.0001, t + .2);
+      o.connect(g); g.connect(actx.destination); o.start(t); o.stop(t + .22);
+    });
+  } catch(e){}
+}
+const goodSound = () => tone([660, 880]);
+const badSound  = () => tone([300, 220]);
+const winSound  = () => tone([523, 659, 784, 1047]);
+function confetti(){
+  const box = document.createElement("div"); box.className = "confetti";
+  const em = ["⭐","🎉","✨","🌟","🎊"];
+  for (let i = 0; i < 40; i++){
+    const s = document.createElement("span");
+    s.textContent = em[i % em.length];
+    s.style.left = Math.random() * 100 + "vw";
+    s.style.animationDelay = Math.random() * .8 + "s";
+    s.style.fontSize = (18 + Math.random() * 22) + "px";
+    box.appendChild(s);
+  }
+  document.body.appendChild(box);
+  setTimeout(() => box.remove(), 3600);
+}
+
+/* ---------- home ---------- */
+function renderHome(){
+  let stars = "";
+  for (let t = 2; t <= 12; t++){ const s = tableInfo(t).star; stars += `<span class="starchip ${s ? "on" : ""}">${s ? "⭐" : "☆"} ${t}</span>`; }
+  const pairs = allPairs();
+  const mastered = pairs.filter(([a,b]) => status(a,b) === "mastered").length;
+  $("#summary").innerHTML = `<div class="stars">${stars}</div>
+    <p class="muted"><b>${mastered}</b> of ${pairs.length} facts mastered (right 3 times in a row, each within 6 seconds).</p>`;
+  let g = `<div class="cell head">×</div>`;
+  for (let c = 2; c <= 12; c++) g += `<div class="cell head">${c}</div>`;
+  for (let r = 2; r <= 12; r++){
+    g += `<div class="cell head">${r}</div>`;
+    for (let c = 2; c <= 12; c++) g += `<div class="cell ${status(r,c)}">${r*c}</div>`;
+  }
+  $("#grid").innerHTML = g;
+  $("#records").innerHTML =
+    `<div class="rec"><small>⏱️ Best mock check</small><b>${data.mock.best === null ? "–" : data.mock.best + "/25"}</b></div>
+     <div class="rec"><small>⚡ Beat the Clock</small><b>${data.clock.best}</b> <small>right in 60 s</small></div>
+     <div class="rec"><small>🔥 Longest streak</small><b>${data.streak.best}</b> <small>in a row</small></div>`;
+  const h = data.mock.history.slice(-12);
+  $("#history").innerHTML = h.length
+    ? `<p>Best score: <b>${data.mock.best} / 25</b> · Aim for 25!</p>
+       <div class="bars">${h.map(x => `<div class="bar" title="${x.date}"><div style="height:${Math.max(2, x.score / 25 * 100)}%"></div><span>${x.score}</span></div>`).join("")}</div>`
+    : `<p class="muted">No mock checks yet. Try one when you feel ready!</p>`;
+  $("#soundBtn").textContent = data.sound ? "🔊" : "🔇";
+}
+function goHome(){ stopSession(); renderHome(); show("home"); }
+
+/* ---------- Learn a Table ---------- */
+const LEVELS = [
+  { name:"Learn",      desc:"In order (1 × t, 2 × t …), no timer",       limit:null  },
+  { name:"Mix it up",  desc:"Mixed order, 12 seconds each",               limit:12000 },
+  { name:"Faster",     desc:"Mixed order, 9 seconds each",                limit:9000  },
+  { name:"Test speed", desc:"6 seconds, like the real check. Get 12/12 for a ⭐", limit:6000 }
+];
+let curTable = 2;
+function renderTables(){
+  let h = "";
+  for (let t = 2; t <= 12; t++){
+    const i = tableInfo(t);
+    h += `<button class="tbtn ${i.star ? "star" : ""}" data-t="${t}"><b>${t}×</b><small>${i.star ? "⭐ Mastered" : "Level " + i.level + " of 4"}</small></button>`;
+  }
+  $("#tableGrid").innerHTML = h;
+  show("tables");
+}
+function renderLevels(t){
+  curTable = t;
+  const info = tableInfo(t);
+  $("#levelTitle").textContent = `The ${t} times table`;
+  $("#levelList").innerHTML = LEVELS.map((L, idx) => {
+    const n = idx + 1, locked = n > info.level;
+    return `<button class="lbtn" data-l="${n}" ${locked ? "disabled" : ""}><b>${locked ? "🔒" : n + "."} ${L.name}</b><small>${L.desc.replace("t,", t + ",").replace("t …", t + " …")}</small></button>`;
+  }).join("");
+  show("levels");
+}
+function startLearn(t, lv){
+  let qs = [];
+  for (let m = 1; m <= 12; m++) qs.push({ a:m, b:t });
+  if (lv > 1) qs = shuffle(qs).map(q => orient(q.a, q.b));
+  startSession({ title:`${t}× · Level ${lv}`, questions:qs, limit:LEVELS[lv-1].limit, feedback:true,
+                 onFinish: res => finishLearn(t, lv, res) });
+}
+function finishLearn(t, lv, res){
+  const score = res.filter(r => r.ok).length;
+  const pass = lv < 4 ? score >= 11 : score === 12;
+  const info = tableInfo(t);
+  let title, msg, celebrate = false;
+  if (pass){
+    if (lv < 4){ if (info.level < lv + 1) info.level = lv + 1; title = "Level passed! 🎉"; msg = `Level ${lv + 1} is unlocked.`; }
+    else { const first = !info.star; info.star = true; title = `${t} times table mastered! ⭐`; msg = first ? "You earned a star!" : "Still a star. Brilliant!"; celebrate = true; }
+  } else {
+    title = "Nearly there!";
+    msg = lv < 4 ? "Get 11 or more right to pass this level." : "Get all 12 right in time to earn the star.";
+  }
+  save();
+  const btns = [];
+  if (pass && lv < 4) btns.push(["Next level ▶", () => startLearn(t, lv + 1), "primary"]);
+  btns.push([pass ? "Play again" : "Try again", () => startLearn(t, lv), (pass && lv < 4) ? "" : "primary"]);
+  btns.push(["Choose a table", renderTables, ""]);
+  btns.push(["Home", goHome, ""]);
+  showResults({ title, score:`${score} / 12`, msg, missed:res.filter(r => !r.ok), buttons:btns, celebrate });
+}
+
+/* ---------- Tricky Facts ---------- */
+function trickyWeight(a,b){
+  const f = data.facts[fkey(a,b)];
+  let w;
+  if (!f || !f.seen) w = 3;
+  else if (f.streak >= 3) w = .4;
+  else if (f.last === 0) w = 8;
+  else w = [6, 4, 2][f.streak] || 2;
+  if (f && f.times.length){ const avg = f.times.reduce((s,x) => s + x, 0) / f.times.length; if (avg > 4000) w += 2; }
+  if (HARD.has(a) || HARD.has(b)) w *= 1.5;
+  return w;
+}
+function startTricky(){
+  const p = allPairs(), w = p.map(([a,b]) => trickyWeight(a,b));
+  const qs = [], count = {};
+  let guard = 0;
+  while (qs.length < 20 && guard++ < 2000){
+    const [pr] = weightedPick(p, w, 1);
+    const k = pr[0] + "x" + pr[1], prev = qs[qs.length - 1];
+    if (prev && fkey(prev.a, prev.b) === k) continue;
+    if ((count[k] || 0) >= 2) continue;
+    count[k] = (count[k] || 0) + 1;
+    qs.push(orient(pr[0], pr[1]));
+  }
+  startSession({ title:"Tricky Facts", questions:qs, limit:6000, feedback:true, requeue:true, maxQ:26, onFinish:finishTricky });
+}
+function finishTricky(res){
+  const score = res.filter(r => r.ok).length;
+  const p = allPairs();
+  const mastered = p.filter(([a,b]) => status(a,b) === "mastered").length;
+  showResults({ title:"Tricky Facts done!", score:`${score} / ${res.length}`,
+    msg:`You have mastered ${mastered} of ${p.length} facts. Wrong answers came back again so you could fix them.`,
+    missed:res.filter(r => !r.ok), buttons:[["Again", startTricky, "primary"], ["Home", goHome, ""]], celebrate:score === res.length });
+}
+
+/* ---------- Mock Check ---------- */
+// Same order of screens as the official check:
+// What to expect → Practice questions (3) → Practice completed → Check questions (25) → Thank you
+function examPage(html, label, onNext, onBack, start){
+  stopSession();
+  $("#xBody").innerHTML = html;
+  const n = $("#xNext");
+  n.textContent = label; n.className = "xbtn" + (start ? " start" : ""); n.onclick = onNext;
+  const b = $("#xBack");
+  b.style.display = onBack ? "" : "none"; b.onclick = onBack;
+  document.querySelector(".xquit").style.display = label === "See my score" ? "none" : "";
+  show("examInfo");
+}
+function startMock(){
+  examPage(`<h1>Mock check</h1><h2>What to expect</h2>
+    <ul><li>There will be <strong>3 practice questions</strong>.</li>
+    <li>Then there will be <strong>25 questions</strong>.</li>
+    <li>Each question will show for <strong>6 seconds</strong>.</li></ul>`, "Next", mockPracticeIntro);
+}
+function mockPracticeIntro(){
+  examPage(`<h1>Practice questions</h1><p class="lede">There will be 3 practice questions.</p>`,
+    "Start now", mockPractice, startMock, true);
+}
+function mockPractice(){
+  // the official check always uses these 3 practice questions; they are not scored
+  startSession({ title:"Practice", questions:[{a:1,b:12},{a:2,b:2},{a:10,b:10}], limit:6000, feedback:false,
+                 exam:true, practice:true, noRecord:true, onFinish:mockPracticeDone });
+}
+function mockPracticeDone(){
+  examPage(`<h1>Practice completed</h1>`, "Next", mockQuestionsIntro);
+}
+function mockQuestionsIntro(){
+  examPage(`<h1>Multiplication tables check questions</h1><p class="lede">There will be 25 questions.</p>`,
+    "Start now", mockReal, null, true);
+}
+function mockReal(){
+  const p = allPairs();
+  const qs = weightedPick(p, p.map(([a,b]) => (HARD.has(a) || HARD.has(b)) ? 2 : 1), 25).map(([a,b]) => orient(a,b));
+  startSession({ title:"Mock Check", questions:shuffle(qs), limit:6000, feedback:false, exam:true,
+                 onFinish:res => examPage(`<h1>Thank you</h1><p class="lede">You have finished the mock check.</p>`,
+                                          "See my score", () => finishMock(res)) });
+}
+function finishMock(res){
+  const score = res.filter(r => r.ok).length;
+  const prevBest = data.mock.best;
+  data.mock.history.push({ date:new Date().toLocaleDateString(), score });
+  if (data.mock.history.length > 60) data.mock.history.shift();
+  const newBest = prevBest === null || score > prevBest;
+  if (newBest) data.mock.best = score;
+  save();
+  let msg = score === 25 ? "Perfect score! You are ready! 🏆"
+          : score >= 22 ? "Brilliant! Just a few to polish."
+          : score >= 17 ? "Great work. Practise the ones you missed."
+          : score >= 10 ? "Good effort! Play Tricky Facts, then try again."
+          : "Keep going. Every practice makes you faster!";
+  if (newBest && prevBest !== null) msg += ` New best score (was ${prevBest})!`;
+  showResults({ title:"Mock Check finished", score:`${score} / 25`, msg, missed:res.filter(r => !r.ok),
+    buttons:[["Try another", startMock, "primary"], ["Practise tricky facts", startTricky, ""], ["Home", goHome, ""]],
+    celebrate: score === 25 || (newBest && prevBest !== null) });
+}
+
+/* ---------- Games: Beat the Clock & Streak ---------- */
+function randomFact(prev){
+  const p = allPairs(), w = p.map(([a,b]) => (HARD.has(a) || HARD.has(b)) ? 1.5 : 1);
+  let pr;
+  do { [pr] = weightedPick(p, w, 1); } while (prev && fkey(prev.a, prev.b) === pr[0] + "x" + pr[1]);
+  return orient(pr[0], pr[1]);
+}
+function startClock(){
+  startSession({ title:"Beat the Clock", questions:[], gen:randomFact, total:60000, feedback:true,
+                 okDelay:250, badDelay:1200, countdown:true, intro:"60 seconds · as many as you can!", onFinish:finishClock });
+}
+function finishClock(res){
+  const right = res.filter(r => r.ok).length;
+  const prev = data.clock.best, newBest = right > prev;
+  if (newBest) data.clock.best = right;
+  data.clock.history.push({ date:new Date().toLocaleDateString(), score:right });
+  if (data.clock.history.length > 60) data.clock.history.shift();
+  save();
+  let msg = newBest && prev > 0 ? `New record! Your old best was ${prev}. 🎉`
+          : newBest ? "That's your first record. Now try to beat it!"
+          : `Your record is ${prev}. ${prev - right <= 3 ? "So close!" : "Keep practising and you'll beat it!"}`;
+  showResults({ title:"Time's up! ⚡", score:`${right} right`, msg:`${msg} (${res.length} answered)`,
+    missed:res.filter(r => !r.ok), buttons:[["Play again", startClock, "primary"], ["Home", goHome, ""]],
+    celebrate:newBest && prev > 0 });
+}
+function startStreak(){
+  startSession({ title:"Streak", questions:[], gen:randomFact, limit:6000, feedback:true, stopOnWrong:true,
+                 okDelay:500, countdown:true, intro:"Keep going until one is wrong!", onFinish:finishStreak });
+}
+function finishStreak(res){
+  const streak = res.filter(r => r.ok).length;
+  const prev = data.streak.best, newBest = streak > prev;
+  if (newBest) data.streak.best = streak;
+  save();
+  const msg = newBest && prev > 0 ? `New record! Your old best was ${prev}. 🎉`
+            : newBest ? "That's your first record. Now try to beat it!"
+            : `Your record is ${prev}. Can you beat it?`;
+  showResults({ title:"Streak over! 🔥", score:`${streak} in a row`, msg,
+    missed:res.filter(r => !r.ok), buttons:[["Play again", startStreak, "primary"], ["Home", goHome, ""]],
+    celebrate:newBest && prev > 0 });
+}
+
+/* ---------- results ---------- */
+function showResults(o){
+  $("#resTitle").textContent = o.title;
+  $("#resScore").textContent = o.score;
+  $("#resMsg").textContent = o.msg;
+  const seen = new Set();
+  const missed = o.missed.filter(r => { const k = r.a + "x" + r.b; if (seen.has(k)) return false; seen.add(k); return true; });
+  $("#resList").innerHTML = missed.length
+    ? `<h3>Facts to practise</h3><div class="chips">${missed.map(r =>
+        `<span class="chip"><b>${r.a} × ${r.b} = ${r.a * r.b}</b><small>${r.given === null ? "no answer" : "you said " + r.given}</small></span>`).join("")}</div>`
+    : "";
+  const box = $("#resButtons"); box.innerHTML = "";
+  o.buttons.forEach(([label, fn, cls]) => {
+    const b = document.createElement("button");
+    b.textContent = label; b.className = "btn " + (cls || ""); b.onclick = fn;
+    box.appendChild(b);
+  });
+  show("results");
+  if (o.celebrate){ confetti(); winSound(); }
+}
+
+/* ---------- question engine ---------- */
+let S = null, sid = 0;
+function later(fn, ms){ const id = S && S.id; setTimeout(() => { if (S && S.id === id) fn(); }, ms); }
+function stopSession(){ if (S){ if (S.raf) cancelAnimationFrame(S.raf); if (S.raf2) cancelAnimationFrame(S.raf2); } S = null; }
+function finishSession(){ const s = S; stopSession(); s.onFinish(s.results); }
+function updateProgress(){
+  let t;
+  if (S.total) t = `⏱ ${Math.max(0, Math.ceil((S.end - performance.now()) / 1000))}s · ✓ ${S.right}`;
+  else if (S.stopOnWrong) t = `🔥 ${S.right}`;
+  else t = `${S.i + 1} / ${S.questions.length}`;
+  $("#progress").textContent = t;
+}
+function begin(){
+  if (S.total){                // one clock for the whole round (Beat the Clock)
+    S.end = performance.now() + S.total;
+    const id = S.id;
+    const loop = () => {
+      if (!S || S.id !== id) return;
+      const rem = S.end - performance.now();
+      setBar(Math.max(0, rem / S.total)); updateProgress();
+      if (rem > 0) S.raf2 = requestAnimationFrame(loop);
+    };
+    S.raf2 = requestAnimationFrame(loop);
+    later(finishSession, S.total);
+  }
+  nextQuestion();
+}
+function setBar(frac){
+  const bar = $("#timerBar");
+  bar.style.width = (frac * 100) + "%";
+  bar.className = frac < .25 ? "low" : frac < .5 ? "mid" : "";
+}
+function renderAnswer(){ const el = $("#answer"); el.textContent = S.answer || " "; el.classList.remove("wrong"); }
+function startSession(cfg){
+  stopSession();
+  S = Object.assign({ i:0, right:0, results:[], answer:"", busy:true, id:++sid }, cfg);
+  show("play");
+  document.body.classList.toggle("exam", !!cfg.exam);
+  document.body.classList.toggle("practice", !!cfg.practice);
+  document.body.classList.remove("loading");
+  $("#timeLeftN").textContent = cfg.limit ? cfg.limit / 1000 : "";
+  $("#playTitle").textContent = cfg.title;
+  $("#timerWrap").style.visibility = (cfg.limit || cfg.total) ? "visible" : "hidden";
+  setBar(1);
+  $("#feedback").textContent = ""; $("#feedback").className = "feedback";
+  if (cfg.countdown){
+    $("#progress").textContent = "";
+    $("#answer").style.visibility = "hidden";
+    let n = 3;
+    const tick = () => {
+      if (n === 0){ begin(); return; }
+      $("#qtext").textContent = n;
+      $("#feedback").textContent = cfg.intro || `${cfg.questions.length} questions · ${cfg.limit / 1000} seconds each`;
+      n--; later(tick, 1000);
+    };
+    tick();
+  } else begin();
+}
+function nextQuestion(){
+  if (S.gen && S.i >= S.questions.length) S.questions.push(S.gen(S.questions[S.i - 1]));
+  if (S.i >= S.questions.length){ finishSession(); return; }
+  const q = S.questions[S.i];
+  if (S.exam && !S.loaded){    // "Question 5…" screen for 3 seconds, like the official check
+    S.busy = true; S.loaded = true;
+    document.body.classList.add("loading");
+    $("#loadingMsg").textContent = `${S.practice ? "Practice question" : "Question"} ${S.i + 1}…`;
+    later(nextQuestion, 3000);
+    return;
+  }
+  S.loaded = false;
+  document.body.classList.remove("loading");
+  updateProgress();
+  $("#qtext").textContent = `${q.a} × ${q.b} =`;
+  S.answer = "";
+  $("#answer").style.visibility = "visible";
+  renderAnswer();
+  $("#feedback").textContent = ""; $("#feedback").className = "feedback";
+  S.busy = false;
+  S.start = performance.now();
+  if (S.limit){
+    setBar(1);
+    const id = S.id, qi = S.i;
+    const live = () => S && S.id === id && S.i === qi && !S.busy;
+    const loop = () => {
+      if (!live()) return;
+      const left = S.limit - (performance.now() - S.start);
+      setBar(Math.max(0, left / S.limit));
+      $("#timeLeftN").textContent = Math.max(0, Math.ceil(left / 1000));
+      S.raf = requestAnimationFrame(loop);
+    };
+    S.raf = requestAnimationFrame(loop);
+    // time's up: whatever is typed counts, like the real check
+    setTimeout(() => { if (live()) submit(); }, S.limit);
+  }
+}
+function submit(){
+  if (!S || S.busy) return;
+  S.busy = true;
+  if (S.raf) cancelAnimationFrame(S.raf);
+  const q = S.questions[S.i];
+  const ms = performance.now() - S.start;
+  const given = S.answer === "" ? null : parseInt(S.answer, 10);
+  const ok = given === q.a * q.b;
+  const timedOut = !!S.limit && ms >= S.limit;
+  if (!S.noRecord) record(q.a, q.b, ok, ms);
+  if (ok) S.right++;
+  S.results.push({ a:q.a, b:q.b, given, ok, ms });
+  save();
+
+  if (!S.feedback){            // Mock Check: no feedback, 3-second pause like the real thing
+    $("#qtext").textContent = "";
+    $("#answer").style.visibility = "hidden";
+    setBar(1); $("#timeLeftN").textContent = S.limit / 1000;
+    S.i++;
+    if (S.exam) nextQuestion(); else later(nextQuestion, S.pause || 3000);
+    return;
+  }
+  const fb = $("#feedback");
+  if (ok){
+    fb.textContent = pick(["✓ Correct!", "✓ Yes!", "✓ Great!", "✓ Spot on!", "✓ Super!"]);
+    fb.className = "feedback good"; goodSound();
+  } else {
+    fb.innerHTML = `${timedOut && given === null ? "⏰ Time's up! " : "✗ "}${q.a} × ${q.b} = <b>${q.a * q.b}</b>`;
+    fb.className = "feedback bad"; badSound();
+    $("#answer").classList.add("wrong");
+    if (S.requeue && S.questions.length < S.maxQ){
+      S.questions.splice(Math.min(S.questions.length, S.i + 4), 0, { a:q.a, b:q.b });
+    }
+  }
+  updateProgress();
+  if (S.stopOnWrong && !ok){ later(finishSession, 2200); return; }
+  S.i++;
+  later(nextQuestion, ok ? (S.okDelay || 700) : (S.badDelay || 2200));
+}
+function press(k){
+  if (!S || S.busy) return;
+  if (k === "del") S.answer = S.answer.slice(0, -1);
+  else if (k === "ok"){ if (S.answer !== "") submit(); return; }
+  else if (S.answer.length < 3) S.answer += k;
+  renderAnswer();
+}
+
+/* ---------- wiring ---------- */
+$("#pad").addEventListener("pointerdown", e => {
+  const b = e.target.closest("button[data-k]"); if (!b) return;
+  e.preventDefault();
+  b.classList.add("down"); setTimeout(() => b.classList.remove("down"), 120);
+  press(b.dataset.k);
+});
+document.addEventListener("keydown", e => {
+  if (!$("#play").classList.contains("active")) return;
+  if (/^[0-9]$/.test(e.key)) press(e.key);
+  else if (e.key === "Backspace"){ e.preventDefault(); press("del"); }
+  else if (e.key === "Enter") press("ok");
+});
+document.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => {
+  const g = b.dataset.go;
+  if (g === "mock") startMock(); else if (g === "tricky") startTricky();
+  else if (g === "clock") startClock(); else if (g === "streak") startStreak(); else renderTables();
+}));
+document.querySelectorAll("[data-home]").forEach(b => b.addEventListener("click", goHome));
+$("#tableGrid").addEventListener("click", e => { const b = e.target.closest("[data-t]"); if (b) renderLevels(+b.dataset.t); });
+$("#levelList").addEventListener("click", e => { const b = e.target.closest("[data-l]"); if (b && !b.disabled) startLearn(curTable, +b.dataset.l); });
+$("#backTables").addEventListener("click", renderTables);
+$("#quitBtn").addEventListener("click", goHome);
+$("#soundBtn").addEventListener("click", () => { data.sound = !data.sound; save(); renderHome(); });
+$("#resetBtn").addEventListener("click", () => {
+  if (confirm("Reset ALL progress (stars, scores, facts)? This cannot be undone.")){ data = blank(); save(); renderHome(); }
+});
+
+/* ---------- backup & restore ---------- */
+function backupMsg(t){ $("#backupMsg").textContent = t; }
+$("#backupBtn").addEventListener("click", () => {
+  try {
+    const stamp = new Date().toISOString().slice(0, 10);
+    const file = JSON.stringify({ app:"times-tables-trainer", version:1, savedAt:new Date().toISOString(), data }, null, 1);
+    const url = URL.createObjectURL(new Blob([file], { type:"application/json" }));
+    const a = document.createElement("a");
+    a.href = url; a.download = `times-tables-backup-${stamp}.json`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+    backupMsg(`✓ Saved "times-tables-backup-${stamp}.json" (look in Downloads).`);
+  } catch(e){ backupMsg("Sorry, the backup could not be saved on this device."); }
+});
+$("#restoreBtn").addEventListener("click", () => $("#restoreFile").click());
+$("#restoreFile").addEventListener("change", async e => {
+  const f = e.target.files && e.target.files[0];
+  e.target.value = "";
+  if (!f) return;
+  try {
+    const obj = JSON.parse(await f.text());
+    const d = obj && obj.data ? obj.data : obj;
+    if (!d || typeof d.facts !== "object" || typeof d.tables !== "object") throw new Error("not a backup");
+    const when = obj.savedAt ? new Date(obj.savedAt).toLocaleString() : "an unknown date";
+    if (!confirm(`Replace the progress on this device with the backup from ${when}?`)) return;
+    data = Object.assign(blank(), d);
+    data.mock = Object.assign(blank().mock, d.mock);
+    data.clock = Object.assign(blank().clock, d.clock);
+    data.streak = Object.assign(blank().streak, d.streak);
+    save(); renderHome();
+    backupMsg("✓ Progress restored.");
+  } catch(err){ backupMsg("That file is not a Times Tables backup."); }
+});
+
+/* ---------- offline support (works on https sites such as GitHub Pages) ---------- */
+if ("serviceWorker" in navigator && window.isSecureContext){
+  window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").catch(() => {}); });
+}
+
+renderHome();
+})();
+</script>
+</body>
+</html>

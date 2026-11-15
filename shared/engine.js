@@ -7,7 +7,9 @@
      input     "number" (default) | "fraction" | "choice" |
                "column" (a number typed into a column sum from Y4.draw.column, ones first) |
                "decimal" (a number with a decimal point key; 3.2 and 3.20 both count) |
-               "time" (a time like 7:45 with a colon key; answer is {h, m}; any12:true also accepts 19:45)
+               "time" (a time like 7:45 with a colon key; answer is {h, m}; any12:true also accepts 19:45) |
+               "tap" (tap one [data-tap] part of the picture; answer is its data-tap value) |
+               "cells" (tap [data-cell] squares on and off, then "Check"; answer is the list of data-cell values)
      answer    number, {n, d} for fractions, or the right choice text
      choices   list of texts, for input "choice"
      check     optional function(given) → true/false, to accept more than one answer
@@ -249,15 +251,17 @@ function nextQuestion(){
   qt.innerHTML = q.text || "";
   qt.classList.toggle("long", !!(q.long || qt.textContent.length > 16 || /[a-z]{3}/.test(qt.textContent)));   // words, not a sum
   $("#qpic").innerHTML = q.picture || "";
-  S.answer = ""; S.fn = ""; S.fd = ""; S.part = "n"; S.neg = false; S.choice = undefined;
+  S.answer = ""; S.fn = ""; S.fd = ""; S.part = "n"; S.neg = false; S.choice = undefined; S.cells = new Set();
   const ans = $("#answer");
   ans.style.visibility = "visible";
-  ans.style.display = mode === "choice" || mode === "column" ? "none" : "";
-  $("#pad").style.display = mode === "choice" ? "none" : "";
+  const noPad = mode === "choice" || mode === "tap" || mode === "cells";
+  ans.style.display = noPad || mode === "column" ? "none" : "";
+  $("#pad").style.display = noPad ? "none" : "";
   $("#nextKey").style.display = mode === "fraction" || mode === "decimal" || mode === "time" || (mode === "number" && q.neg) ? "" : "none";
   const ch = $("#choices");
-  ch.style.display = mode === "choice" ? "" : "none";
-  ch.innerHTML = mode === "choice" ? q.choices.map((c,i) => `<button class="choice" data-c="${i}">${c}</button>`).join("") : "";
+  ch.style.display = mode === "choice" || mode === "cells" ? "" : "none";
+  ch.innerHTML = mode === "choice" ? q.choices.map((c,i) => `<button class="choice" data-c="${i}">${c}</button>`).join("")
+               : mode === "cells" ? `<button class="choice check" data-check>Check ✓</button>` : "";
   renderAnswer();
   $("#feedback").textContent = ""; $("#feedback").className = "feedback";
   $("#cont").innerHTML = "";
@@ -285,7 +289,8 @@ function readGiven(q){
     if (S.fn === "" && S.fd === "") return null;
     return { n: S.fn === "" ? null : +S.fn, d: S.fd === "" ? null : +S.fd };
   }
-  if (m === "choice") return S.choice === undefined ? null : S.choice;
+  if (m === "choice" || m === "tap") return S.choice === undefined ? null : S.choice;
+  if (m === "cells") return [...S.cells].sort();
   if (m === "time") return readTime(S.answer);
   if (S.answer === "" || S.answer === "0.") return null;
   const v = m === "decimal" ? parseFloat(S.answer) : parseInt(S.answer, 10);
@@ -305,6 +310,8 @@ Y4.timeText = (h, m) => `${h}:${String(m).padStart(2, "0")}`;
 function givenText(q, g){
   if (g === null) return null;
   if (inputOf(q) === "time") return g.bad ? g.text : Y4.timeText(g.h, g.m);
+  if (inputOf(q) === "cells") return `${g.length} square${g.length === 1 ? "" : "s"} coloured`;
+  if (inputOf(q) === "tap") return q.tapText ? q.tapText(g) : String(g);
   if (inputOf(q) === "fraction") return `${g.n === null ? "?" : g.n}/${g.d === null ? "?" : g.d}`;
   const shown = q.prefix === "£" ? g.toFixed(2) : String(g).replace("-", "−");
   return (q.prefix || "") + shown + (q.suffix || "");
@@ -315,6 +322,7 @@ function isRight(q, g){
   if (inputOf(q) === "fraction")   // any equal fraction counts (2/4 = 1/2)
     return g.n !== null && !!g.d && g.n * q.answer.d === g.d * q.answer.n;
   if (inputOf(q) === "decimal") return Math.abs(g - q.answer) < 1e-6;
+  if (inputOf(q) === "cells") return g.length === q.answer.length && q.answer.every(k => S.cells.has(k));
   if (inputOf(q) === "time") return !g.bad && g.m === q.answer.m && (q.any12 ? g.h % 12 === q.answer.h % 12 : g.h === q.answer.h);
   return g === q.answer;
 }
@@ -338,6 +346,21 @@ function submit(){
     S.i++;
     if (S.exam) nextQuestion(); else later(nextQuestion, S.pause || 3000);
     return;
+  }
+  if (inputOf(q) === "tap"){                       // show the right place, and the wrong tap
+    document.querySelectorAll("#qpic [data-tap]").forEach(t => {
+      if (t.dataset.tap === String(q.answer)) t.classList.add("right");
+      else if (t.dataset.tap === given) t.classList.add("wrongpick");
+    });
+  }
+  if (inputOf(q) === "cells"){
+    const want = new Set(q.answer);
+    document.querySelectorAll("#qpic [data-cell]").forEach(c => {
+      const k = c.dataset.cell, on = S.cells.has(k);
+      if (want.has(k) && !on) c.classList.add("missed");
+      if (!want.has(k) && on) c.classList.add("wrongpick");
+    });
+    $("#choices").innerHTML = "";
   }
   if (inputOf(q) === "choice"){
     document.querySelectorAll("#choices .choice").forEach(b => {
@@ -376,7 +399,8 @@ function press(k){
   if (S.waiting){ if (k === "ok") proceed(); return; }
   if (S.busy) return;
   const q = S.questions[S.i], m = inputOf(q);
-  if (m === "choice") return;
+  if (m === "choice" || m === "tap") return;
+  if (m === "cells"){ if (k === "ok") submit(); return; }
   if (m === "fraction"){
     const key = S.part === "n" ? "fn" : "fd";
     if (k === "ok"){
@@ -422,7 +446,22 @@ $("#pad").addEventListener("pointerdown", e => {
   b.classList.add("down"); setTimeout(() => b.classList.remove("down"), 120);
   press(b.dataset.k);
 });
-$("#choices").addEventListener("click", e => { const b = e.target.closest("[data-c]"); if (b) choose(+b.dataset.c); });
+$("#choices").addEventListener("click", e => {
+  const b = e.target.closest("[data-c]"); if (b) choose(+b.dataset.c);
+  if (e.target.closest("[data-check]") && S && !S.busy) submit();
+});
+$("#qpic").addEventListener("click", e => {          // tapping the picture
+  if (!S || S.busy) return;
+  const q = S.questions[S.i], m = inputOf(q);
+  const t = e.target.closest("[data-tap]");
+  if (m === "tap" && t){ S.choice = t.dataset.tap; t.classList.add("picked"); submit(); return; }
+  const c = e.target.closest("[data-cell]");
+  if (m === "cells" && c){
+    const k = c.dataset.cell;
+    if (S.cells.has(k)) S.cells.delete(k); else S.cells.add(k);
+    c.classList.toggle("on", S.cells.has(k));
+  }
+});
 $("#answer").addEventListener("pointerdown", e => {
   const p = e.target.closest("[data-part]");
   if (p && S && !S.busy){ S.part = p.dataset.part; renderAnswer(); }

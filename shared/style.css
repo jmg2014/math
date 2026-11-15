@@ -197,3 +197,34 @@ h3{font-size:1.05rem;margin:1.2em 0 .5em}
 .coin.note{border-radius:8px;width:92px;background:#a7d8b9;border-color:#3f8a5c;color:#123d22}
 .pv.menu th{text-align:left;font-size:.6em;color:var(--ink);padding-right:.8em}
 .pv.menu td{padding:0 .4em;font-size:.8em}
+
+/* shapes, angles, symmetry and coordinates */
+.poly{width:100%;max-width:300px;margin:0 auto}
+.poly svg,.ang svg,.cgrid svg{width:100%;height:auto;display:block}
+.pg-tick{stroke:var(--ink);stroke-width:2.5}
+.pg-right{fill:none;stroke:var(--ink);stroke-width:2.5}
+.sym-line{stroke:var(--share);stroke-width:4;stroke-dasharray:10 7}
+.ang{width:100%;max-width:270px;margin:0 auto}
+.an-arm{stroke:var(--ink);stroke-width:6;stroke-linecap:round}
+.an-arc{fill:none;stroke:var(--accent);stroke-width:4}
+.an-cap{text-align:center;font-size:1.6rem;font-weight:900;color:var(--accent)}
+.angles .ang{display:flex;flex-direction:column;justify-content:space-between}
+.angles{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.angles .ang{width:calc((100% - 20px) / 3);max-width:230px}
+.tapcell{cursor:pointer}
+.tapcell.on{fill:var(--accent)}
+.tapcell.missed{fill:var(--good);opacity:.7}
+.tapcell.wrongpick{fill:var(--bad)}
+.choice.check{background:var(--good);color:#fff;border-color:var(--good);box-shadow:0 4px 0 #157a49}
+.cgrid{width:100%;max-width:420px;margin:0 auto}
+.cg-line{stroke:var(--line);stroke-width:1.5}
+.cg-axis{stroke:var(--ink);stroke-width:3}
+.cg-num{fill:var(--muted);font-size:16px;font-weight:700;text-anchor:middle}
+.cg-shape{stroke:var(--accent);stroke-width:3}
+.cg-pt{fill:var(--accent);stroke:var(--card);stroke-width:2}
+.cg-pt.end{fill:var(--share)}
+.cg-lab{fill:var(--ink);font-size:22px;font-weight:900}
+.cg-tap{fill:transparent;cursor:pointer}
+.cg-tap.picked,.cg-tap.wrongpick{fill:var(--bad);opacity:.85}
+.cg-tap.right{fill:var(--good);opacity:.9}
+.cg-tap.picked.right{fill:var(--good)}

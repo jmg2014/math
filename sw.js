@@ -2,7 +2,7 @@
 // When online, every file is fetched fresh (so new and old files never get mixed after an update),
 // and the saved copy is refreshed. When offline, the saved copy is used.
 // When you add a file, add it to FILES and change the number in CACHE.
-const CACHE = "year4-maths-v6";
+const CACHE = "year4-maths-v7";
 const FILES = [
   "./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png",
   "./shared/style.css", "./shared/progress.js", "./shared/engine.js", "./shared/draw.js", "./shared/topic.js",
@@ -11,7 +11,8 @@ const FILES = [
   "./number/", "./number/index.html", "./number/skills.js",
   "./add-subtract/", "./add-subtract/index.html", "./add-subtract/skills.js",
   "./fractions/", "./fractions/index.html", "./fractions/skills.js",
-  "./measurement/", "./measurement/index.html", "./measurement/skills.js"
+  "./measurement/", "./measurement/index.html", "./measurement/skills.js",
+  "./shapes/", "./shapes/index.html", "./shapes/skills.js"
 ];
 
 self.addEventListener("install", e => {

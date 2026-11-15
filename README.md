@@ -13,7 +13,8 @@ See [ROADMAP.md](ROADMAP.md) for what is built and what comes next.
 | ➕ Addition & Subtraction | `add-subtract/` | ✅ Built |
 | 🍕 Fractions & Decimals | `fractions/` | ✅ Built |
 | 📏 Measurement | `measurement/` | ✅ Built |
-| 🔷 Shapes, 📊 Statistics | – | 🚧 Coming soon |
+| 🔷 Shapes & Position | `shapes/` | ✅ Built |
+| 📊 Statistics | – | 🚧 Coming soon |
 
 ---
 
@@ -179,6 +180,18 @@ Money answers show **£** in the answer box, so only the number is typed.
 
 **Time answers:** type the hours, tap **Colon :**, then type the minutes (or just type 745 for 7:45).
 When reading a clock, both 7:45 and 19:45 count.
+
+## 🔷 Shapes & Position
+
+| Skill | Level 1 | Level 2 | Level 3 |
+|---|---|---|---|
+| 🔷 Triangles and quadrilaterals | Equilateral, isosceles or scalene? | Square, rectangle, rhombus, parallelogram, trapezium or kite? | Properties: "exactly one pair of parallel sides?" · "is every square a rectangle?" |
+| 📐 Angles | Acute, right or obtuse? | Biggest or smallest of three · put in order | Clock hands · right angles inside a shape · turns |
+| 🦋 Symmetry | Is the dashed line a mirror line? | How many lines of symmetry? | Tap squares to complete a symmetrical shape |
+| 📍 Coordinates | Read a point (across first, then up) | Tap a point on the grid | Move a point · describe a move · the 4th corner of a rectangle |
+
+**Tapping answers:** some questions are answered by tapping the picture: a point on the grid, or squares to colour
+(tap again to clear a square, then press **Check ✓**). Afterwards, green shows the right answer and red shows a mistake.
 
 ---
 

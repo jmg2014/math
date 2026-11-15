@@ -73,7 +73,7 @@ Each skill is one small **generator** that returns a new question each time:
 | Decimal keypad (`input:"decimal"`, with a decimal point key; `prefix:"£"` or `suffix:" m"` shown around the answer) | decimals, money, measures |
 | Time (`input:"time"`): type 7:45 with a colon key; `any12:true` also accepts 19:45 | time |
 | Multiple choice (2–4 big buttons) | shape names, angle types, comparing |
-| Tap the picture | coordinates, symmetry, chart questions |
+| Tap the picture (`input:"tap"` for one place, `input:"cells"` to colour squares then Check) | coordinates, symmetry, chart questions |
 
 **How the child improves over time.** This is the same idea that already works in *Tricky Facts*:
 - Every skill has **3 levels**, e.g. rounding to 10 → 100 → 1000.
@@ -136,11 +136,11 @@ first because most other topics depend on them.
 - [x] Money: adding up prices, working out change
 - [x] Time: read analogue clocks, and convert between 12-hour and 24-hour time
 
-### Phase 6 – Geometry
-- [ ] Name the triangle or quadrilateral (shapes generated at random)
-- [ ] Acute, obtuse or right angle, and order angles by size
-- [ ] Lines of symmetry, and completing a symmetric shape on a grid
-- [ ] Plot and read coordinates, and describe moves ("3 right, 2 up")
+### Phase 6 – Geometry ✅
+- [x] Name the triangle or quadrilateral (shapes generated at random)
+- [x] Acute, obtuse or right angle, and order angles by size
+- [x] Lines of symmetry, and completing a symmetric shape on a grid
+- [x] Plot and read coordinates, and describe moves ("3 right, 2 up")
 
 ### Phase 7 – Statistics
 - [ ] Bar charts, pictograms, tables and time graphs, drawn from random data

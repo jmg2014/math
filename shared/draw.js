@@ -151,6 +151,85 @@ Y4.draw = {
     const kind = v => v >= 500 ? "note" : v >= 100 ? "gold" : v >= 5 ? "silver" : "copper";
     return `<div class="coins">${list.map(v => `<span class="coin ${kind(v)}">${label(v)}</span>`).join("")}</div>`;
   },
+  /* a polygon from points (any units, y down). opts: ticks {sideIndex: 1|2} marks equal sides,
+     right [cornerIndex…] marks right angles, line {x1,y1,x2,y2} draws a dashed line (in the same units) */
+  polygon(points, opts){
+    opts = opts || {};
+    const xs = points.map(p => p[0]), ys = points.map(p => p[1]);
+    const w = Math.max(...xs) - Math.min(...xs) || 1, h = Math.max(...ys) - Math.min(...ys) || 1;
+    const k = Math.min(220 / w, 170 / h), pad = 24;
+    const T = ([x, y]) => [pad + (x - Math.min(...xs)) * k, pad + (y - Math.min(...ys)) * k];
+    const P = points.map(T), W = w * k + 2 * pad, H = h * k + 2 * pad;
+    let s = `<polygon points="${P.map(p => p.map(v => v.toFixed(1)).join(",")).join(" ")}" class="ls-shape"/>`;
+    Object.entries(opts.ticks || {}).forEach(([i, n]) => {               // little marks across equal sides
+      const a = P[+i], b = P[(+i + 1) % P.length], mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2;
+      const len = Math.hypot(b[0] - a[0], b[1] - a[1]), ux = (b[0] - a[0]) / len, uy = (b[1] - a[1]) / len;
+      for (let j = 0; j < n; j++){
+        const off = (j - (n - 1) / 2) * 7, cx = mx + ux * off, cy = my + uy * off;
+        s += `<line x1="${(cx - uy * 8).toFixed(1)}" y1="${(cy + ux * 8).toFixed(1)}" x2="${(cx + uy * 8).toFixed(1)}" y2="${(cy - ux * 8).toFixed(1)}" class="pg-tick"/>`;
+      }
+    });
+    (opts.right || []).forEach(i => {                                      // right angle squares
+      const v = P[i], a = P[(i + P.length - 1) % P.length], b = P[(i + 1) % P.length], m = 14;
+      const u1 = [(a[0] - v[0]) / Math.hypot(a[0] - v[0], a[1] - v[1]), (a[1] - v[1]) / Math.hypot(a[0] - v[0], a[1] - v[1])];
+      const u2 = [(b[0] - v[0]) / Math.hypot(b[0] - v[0], b[1] - v[1]), (b[1] - v[1]) / Math.hypot(b[0] - v[0], b[1] - v[1])];
+      const p1 = [v[0] + u1[0] * m, v[1] + u1[1] * m], p2 = [p1[0] + u2[0] * m, p1[1] + u2[1] * m], p3 = [v[0] + u2[0] * m, v[1] + u2[1] * m];
+      s += `<polyline points="${[p1, p2, p3].map(p => p.map(n => n.toFixed(1)).join(",")).join(" ")}" class="pg-right"/>`;
+    });
+    if (opts.line){
+      const [a, b] = [T([opts.line.x1, opts.line.y1]), T([opts.line.x2, opts.line.y2])];
+      s += `<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" class="sym-line"/>`;
+    }
+    return `<div class="poly"><svg viewBox="0 0 ${W.toFixed(0)} ${H.toFixed(0)}" aria-hidden="true">${s}</svg></div>`;
+  },
+  /* an angle of `deg` degrees, the first arm pointing at `rot` degrees; label is written underneath */
+  angle(deg, rot, label, len){
+    const R = len || 110, rad = d => d * Math.PI / 180;
+    const p1 = [R * Math.cos(rad(rot)), -R * Math.sin(rad(rot))], p2 = [R * Math.cos(rad(rot + deg)), -R * Math.sin(rad(rot + deg))];
+    const ox = 120, oy = 120, W = 240, H = 240;          // the same scale for every angle, so arms can be compared
+    let s = `<line x1="${ox}" y1="${oy}" x2="${ox + p1[0]}" y2="${oy + p1[1]}" class="an-arm"/><line x1="${ox}" y1="${oy}" x2="${ox + p2[0]}" y2="${oy + p2[1]}" class="an-arm"/>`;
+    if (deg === 90){
+      const m = 18, a = [Math.cos(rad(rot)), -Math.sin(rad(rot))], b = [Math.cos(rad(rot + 90)), -Math.sin(rad(rot + 90))];
+      s += `<polyline points="${ox + a[0] * m},${oy + a[1] * m} ${ox + (a[0] + b[0]) * m},${oy + (a[1] + b[1]) * m} ${ox + b[0] * m},${oy + b[1] * m}" class="pg-right"/>`;
+    } else {
+      const r = 30, a = [ox + r * Math.cos(rad(rot)), oy - r * Math.sin(rad(rot))], b = [ox + r * Math.cos(rad(rot + deg)), oy - r * Math.sin(rad(rot + deg))];
+      s += `<path d="M${a[0].toFixed(1)},${a[1].toFixed(1)} A${r},${r} 0 ${deg > 180 ? 1 : 0} 0 ${b[0].toFixed(1)},${b[1].toFixed(1)}" class="an-arc"/>`;
+    }
+    return `<div class="ang"><svg viewBox="0 0 ${W.toFixed(0)} ${H.toFixed(0)}" aria-hidden="true">${s}</svg>${label ? `<div class="an-cap">${label}</div>` : ""}</div>`;
+  },
+  /* squared paper for symmetry: shaded cells, optional tappable cells, and a dashed mirror line.
+     line: {v: x} for a vertical line at x squares from the left, or {h: y} for a horizontal one */
+  symGrid(shaded, rows, cols, line, tappable){
+    const S = 34, on = new Set(shaded.map(([r, c]) => r + "," + c)), tap = new Set((tappable || []).map(([r, c]) => r + "," + c));
+    let s = "";
+    for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++){
+      const k = r + "," + c;
+      s += `<rect x="${2 + c * S}" y="${2 + r * S}" width="${S}" height="${S}" class="${on.has(k) ? "gs-on" : "gs-off"} ${tap.has(k) ? "tapcell" : ""}" ${tap.has(k) ? `data-cell="${k}"` : ""}/>`;
+    }
+    if (line && line.v !== undefined) s += `<line x1="${2 + line.v * S}" y1="0" x2="${2 + line.v * S}" y2="${rows * S + 4}" class="sym-line"/>`;
+    if (line && line.h !== undefined) s += `<line x1="0" y1="${2 + line.h * S}" x2="${cols * S + 4}" y2="${2 + line.h * S}" class="sym-line"/>`;
+    return `<div class="gshape" style="max-width:${Math.min(cols * S * 1.3, 440)}px"><svg viewBox="0 0 ${cols * S + 4} ${rows * S + 4}">${s}</svg></div>`;
+  },
+  /* a coordinate grid from 0 to n. points: [{x, y, label}]; lines: [[x1,y1,x2,y2]]; tap: every crossing can be tapped */
+  coordGrid(n, points, lines, tap){
+    const S = 40, o = 34, W = o + n * S + 20, H = n * S + 20 + o;
+    const X = x => o + x * S, Y = y => 14 + (n - y) * S;
+    let s = "";
+    for (let i = 0; i <= n; i++){
+      s += `<line x1="${X(i)}" y1="${Y(0)}" x2="${X(i)}" y2="${Y(n)}" class="cg-line"/><line x1="${X(0)}" y1="${Y(i)}" x2="${X(n)}" y2="${Y(i)}" class="cg-line"/>`;
+      s += `<text x="${X(i)}" y="${Y(0) + 24}" class="cg-num">${i}</text>`;
+      if (i) s += `<text x="${X(0) - 14}" y="${Y(i) + 6}" class="cg-num">${i}</text>`;
+    }
+    s += `<line x1="${X(0)}" y1="${Y(0)}" x2="${X(n)}" y2="${Y(0)}" class="cg-axis"/><line x1="${X(0)}" y1="${Y(0)}" x2="${X(0)}" y2="${Y(n)}" class="cg-axis"/>`;
+    (lines || []).forEach(([a, b, c, d]) => { s += `<line x1="${X(a)}" y1="${Y(b)}" x2="${X(c)}" y2="${Y(d)}" class="cg-shape"/>`; });
+    if (tap) for (let x = 0; x <= n; x++) for (let y = 0; y <= n; y++)
+      s += `<circle cx="${X(x)}" cy="${Y(y)}" r="${S * .42}" class="cg-tap" data-tap="${x},${y}"/>`;
+    (points || []).forEach(p => {
+      s += `<circle cx="${X(p.x)}" cy="${Y(p.y)}" r="7" class="cg-pt ${p.cls || ""}"/>`;
+      if (p.label) s += `<text x="${X(p.x) + 13}" y="${Y(p.y) - 10}" class="cg-lab">${p.label}</text>`;
+    });
+    return `<div class="cgrid"><svg viewBox="0 0 ${W} ${H}">${s}</svg></div>`;
+  },
   /* a place value chart with decimals (T O . t h), one row per number, e.g. to show ÷ 10 */
   decimalChart(rows){
     const cols = ["T", "O", "t", "h"];

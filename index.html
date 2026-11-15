@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#6c4cf1">
+<title>Year 4 Maths</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="stylesheet" href="shared/style.css">
+</head>
+<body>
+<section id="hub" class="screen active">
+  <div class="top">
+    <h1>🎒 Year 4 Maths</h1>
+    <button id="soundBtn" class="ghost" aria-label="Sound on or off">🔊</button>
+  </div>
+  <div id="topics" class="modes"></div>
+  <div class="panel">
+    <h2>💾 Backup</h2>
+    <p class="muted">Progress is saved on this device only. Save a backup file to keep it safe, or to move it to a new address or device.
+      Older Times Tables backup files can be restored here too.</p>
+    <div class="btnrow" style="justify-content:flex-start;margin-top:10px">
+      <button id="backupBtn" class="btn primary">⬇️ Save backup</button>
+      <button id="restoreBtn" class="btn">⬆️ Restore from backup</button>
+      <input id="restoreFile" type="file" accept=".json,application/json" hidden>
+    </div>
+    <p id="backupMsg" class="muted" style="min-height:1.2em"></p>
+  </div>
+  <button id="resetBtn" class="link">Reset ALL progress</button>
+</section>
+
+<script src="shared/progress.js"></script>
+<script src="shared/engine.js"></script>
+<!-- each built topic's skills, so this page can show its progress -->
+<script src="multiply-divide/skills.js"></script>
+<script>
+(function(){
+"use strict";
+const { $, prog:P } = Y4;
+
+/* The 8 parts of the Year 4 curriculum. `path` is set once a topic is built. */
+const TOPICS = [
+  { id:"times-tables",    emoji:"✖️", name:"Times Tables",              path:"times-tables/",    desc:"All tables to 12 × 12, and the Multiplication Tables Check" },
+  { id:"multiply-divide", emoji:"➗", name:"Multiplication & Division", path:"multiply-divide/", desc:"Division facts, factor pairs, written method, sharing problems" },
+  { id:"number",          emoji:"🔢", name:"Number & Place Value",      desc:"Thousands, rounding, negative numbers, Roman numerals" },
+  { id:"add-subtract",    emoji:"➕", name:"Addition & Subtraction",    desc:"Column method, estimating, two-step problems" },
+  { id:"fractions",       emoji:"🍕", name:"Fractions & Decimals",      desc:"Equivalent fractions, tenths and hundredths, ¾ of 20" },
+  { id:"measurement",     emoji:"📏", name:"Measurement",               desc:"Units, perimeter, area, money, time" },
+  { id:"shapes",          emoji:"🔷", name:"Shapes & Position",         desc:"Triangles, angles, symmetry, coordinates" },
+  { id:"statistics",      emoji:"📊", name:"Statistics",                desc:"Bar charts, pictograms, tables" }
+];
+
+function ttProgress(){
+  const d = P.timesTables();
+  if (!d) return "Not started yet";
+  let stars = 0; for (let t = 2; t <= 12; t++) if (d.tables && d.tables[t] && d.tables[t].star) stars++;
+  const best = d.mock && d.mock.best !== null && d.mock.best !== undefined ? ` · best mock ${d.mock.best}/25` : "";
+  return `⭐ ${stars} of 11 tables${best}`;
+}
+function render(){
+  $("#topics").innerHTML = TOPICS.map(t => {
+    if (!t.path) return `<div class="mode soon"><span class="emoji">${t.emoji}</span><b>${t.name}</b><small>${t.desc}</small><small>🚧 Coming soon</small></div>`;
+    let p;
+    if (t.id === "times-tables") p = ttProgress();
+    else { const topic = Y4.TOPICS.find(x => x.id === t.id); p = `⭐ ${P.topicStars(topic)} of ${topic.skills.length} skills`; }
+    return `<a class="mode ${t.id === "times-tables" ? "main" : ""}" href="${t.path}"><span class="emoji">${t.emoji}</span><b>${t.name}</b><small>${t.desc}</small><small><b style="font-size:1rem;color:var(--ink)">${p}</b></small></a>`;
+  }).join("");
+  $("#soundBtn").textContent = P.sound ? "🔊" : "🔇";
+}
+
+$("#soundBtn").addEventListener("click", () => { P.sound = !P.sound; render(); });
+$("#resetBtn").addEventListener("click", () => {
+  if (confirm("Reset ALL progress in every topic (stars, scores, facts)? This cannot be undone.")){ P.resetAll(); render(); }
+});
+
+/* ---------- backup & restore ---------- */
+function backupMsg(t){ $("#backupMsg").textContent = t; }
+$("#backupBtn").addEventListener("click", () => {
+  try {
+    const stamp = new Date().toISOString().slice(0, 10);
+    const file = JSON.stringify(P.backup(), null, 1);
+    const url = URL.createObjectURL(new Blob([file], { type:"application/json" }));
+    const a = document.createElement("a");
+    a.href = url; a.download = `year4-maths-backup-${stamp}.json`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+    backupMsg(`✓ Saved "year4-maths-backup-${stamp}.json" (look in Downloads).`);
+  } catch(e){ backupMsg("Sorry, the backup could not be saved on this device."); }
+});
+$("#restoreBtn").addEventListener("click", () => $("#restoreFile").click());
+$("#restoreFile").addEventListener("change", async e => {
+  const f = e.target.files && e.target.files[0];
+  e.target.value = "";
+  if (!f) return;
+  let obj;
+  try { obj = JSON.parse(await f.text()); } catch(err){ backupMsg("That file is not a Year 4 Maths backup."); return; }
+  const when = obj && obj.savedAt ? new Date(obj.savedAt).toLocaleString() : "an unknown date";
+  if (!confirm(`Replace the progress on this device with the backup from ${when}?`)) return;
+  try { P.restore(obj); render(); backupMsg("✓ Progress restored."); }
+  catch(err){ backupMsg("That file is not a Year 4 Maths backup."); }
+});
+
+Y4.registerOffline("sw.js");
+render();
+})();
+</script>
+</body>
+</html>

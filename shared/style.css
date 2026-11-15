@@ -157,3 +157,15 @@ h3{font-size:1.05rem;margin:1.2em 0 .5em}
 .pv td{background:var(--card);border:2px solid var(--line);border-radius:10px;min-width:1.8em;height:1.6em;text-align:center}
 .pv td.on{background:#ffe9a8;border-color:#f2c94c;color:#6a4a00}
 .feedback .nl,.feedback .pv{margin-top:8px}
+
+/* fractions and decimals */
+.fbar{width:100%;max-width:440px;margin:0 auto}
+.fbar svg{width:100%;height:auto;display:block}
+.fb-lab{fill:var(--ink);font-size:22px;font-weight:800;text-anchor:end}
+.hsq{width:clamp(150px,30vw,210px)}
+.hsq svg{width:100%;height:auto;display:block}
+.hsq .pie{stroke-width:1}
+.pv.dec td{min-width:1.4em}
+.pv.dec td.dot{background:none;border:none;min-width:.4em}
+.pv.dec th.rl{font-size:.55em;text-align:left;padding-left:.6em;white-space:nowrap}
+.choice .frac{font-size:.95em}

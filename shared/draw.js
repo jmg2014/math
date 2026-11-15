@@ -50,7 +50,7 @@ Y4.draw = {
     const x = v => pad + (v - lo) / (hi - lo) * (W - 2 * pad);
     let h = `<line x1="${pad - 14}" y1="${y}" x2="${W - pad + 14}" y2="${y}" class="nl-axis"/>`;
     for (let i = 0; i <= n; i++){
-      const v = lo + i * step, big = i % le === 0;
+      const v = +(lo + i * step).toFixed(6), big = i % le === 0;    // toFixed: 0.1 steps don't drift
       h += `<line x1="${x(v)}" y1="${y - (big ? 9 : 5)}" x2="${x(v)}" y2="${y + (big ? 9 : 5)}" class="nl-axis"/>`;
       if (big) h += `<text x="${x(v)}" y="${y + 30}" class="nl-num ${v === 0 ? "zero" : ""}">${Y4.num(v)}</text>`;
     }
@@ -65,8 +65,36 @@ Y4.draw = {
     const d = String(n).padStart(4, " ").split(""), heads = ["Th", "H", "T", "O"];
     return `<table class="pv"><tr>${heads.map(t => `<th>${t}</th>`).join("")}</tr>
       <tr>${d.map((c, i) => `<td class="${i === highlight ? "on" : ""}">${c.trim()}</td>`).join("")}</tr></table>`;
+  },
+  /* a fraction bar: `parts` equal parts, the first `shaded` coloured, with an optional label on the left */
+  fracBar(parts, shaded, label){
+    const W = 420, x0 = label ? 82 : 2, w = (W - x0 - 2) / parts;
+    let h = label ? `<text x="${x0 - 12}" y="36" class="fb-lab">${label}</text>` : "";
+    for (let i = 0; i < parts; i++) h += `<rect class="pie ${i < shaded ? "on" : ""}" x="${(x0 + i * w).toFixed(2)}" y="8" width="${w.toFixed(2)}" height="40" rx="3"/>`;
+    return `<div class="fbar"><svg viewBox="0 0 ${W} 56" aria-hidden="true">${h}</svg></div>`;
+  },
+  /* a hundred square with `n` small squares coloured (n can be 0–100) */
+  hundredSquare(n){
+    let h = "";
+    for (let i = 0; i < 100; i++){
+      const r = Math.floor(i / 10), c = i % 10;
+      h += `<rect class="pie ${i < n ? "on" : ""}" x="${2 + c * 19.6}" y="${2 + r * 19.6}" width="19.6" height="19.6"/>`;
+    }
+    return `<div class="hsq"><svg viewBox="0 0 200 200" aria-hidden="true">${h}</svg></div>`;
+  },
+  /* a place value chart with decimals (T O . t h), one row per number, e.g. to show ÷ 10 */
+  decimalChart(rows){
+    const cols = ["T", "O", "t", "h"];
+    const cells = v => {
+      const [w, f = ""] = String(v).split(".");
+      const ws = w.padStart(2, " "), fs = f.padEnd(2, " ");
+      return [ws[0], ws[1], fs[0], fs[1]].map(c => c.trim());
+    };
+    return `<table class="pv dec"><tr>${cols.map((c, i) => `<th>${c}</th>${i === 1 ? "<th></th>" : ""}`).join("")}<th></th></tr>` +
+      rows.map(([v, label]) => `<tr>${cells(v).map((c, i) => `<td>${c}</td>${i === 1 ? `<td class="dot">.</td>` : ""}`).join("")}<th class="rl">${label || ""}</th></tr>`).join("") +
+      `</table>`;
   }
 };
 /* numbers written the way children read them: a real minus sign */
-Y4.num = v => v < 0 ? "−" + (-v) : String(v);
+Y4.num = v => v < 0 ? "−" + String(+(-v).toFixed(6)) : String(+v.toFixed(6));
 })();

@@ -5,11 +5,13 @@
      text      what is asked (HTML allowed)
      picture   optional HTML/SVG shown above it
      input     "number" (default) | "fraction" | "choice" |
-               "column" (a number typed into a column sum from Y4.draw.column, ones first)
+               "column" (a number typed into a column sum from Y4.draw.column, ones first) |
+               "decimal" (a number with a decimal point key; 3.2 and 3.20 both count)
      answer    number, {n, d} for fractions, or the right choice text
      choices   list of texts, for input "choice"
      check     optional function(given) → true/false, to accept more than one answer
-     maxLen    longest number that can be typed (default 3)
+     maxLen    longest number that can be typed (default 3, or 6 for decimals)
+     prefix, suffix   shown around the typed answer, e.g. "£" or "p"
      neg       true to show a "minus" key, for negative answers
      explain   HTML shown when the answer is wrong
      solution  short text for the "to practise" list on the results screen
@@ -195,8 +197,9 @@ function renderAnswer(){
     if (row) row.classList.remove("wrong");
   } else {
     el.classList.remove("fracbox");
-    el.textContent = (S.answer || S.neg) ? (S.neg ? "−" : "") + S.answer : " ";
-    $("#nextKey").textContent = S.neg ? "Make it positive +" : "Make it negative −";
+    const typed = (S.neg ? "−" : "") + S.answer, pre = q.prefix || "", suf = q.suffix || "";
+    el.textContent = typed || pre || suf ? pre + typed + suf : " ";
+    $("#nextKey").textContent = inputOf(q) === "decimal" ? "Decimal point ." : S.neg ? "Make it positive +" : "Make it negative −";
   }
 }
 function startSession(cfg){
@@ -250,7 +253,7 @@ function nextQuestion(){
   ans.style.visibility = "visible";
   ans.style.display = mode === "choice" || mode === "column" ? "none" : "";
   $("#pad").style.display = mode === "choice" ? "none" : "";
-  $("#nextKey").style.display = mode === "fraction" || (mode === "number" && q.neg) ? "" : "none";
+  $("#nextKey").style.display = mode === "fraction" || mode === "decimal" || (mode === "number" && q.neg) ? "" : "none";
   const ch = $("#choices");
   ch.style.display = mode === "choice" ? "" : "none";
   ch.innerHTML = mode === "choice" ? q.choices.map((c,i) => `<button class="choice" data-c="${i}">${c}</button>`).join("") : "";
@@ -282,20 +285,22 @@ function readGiven(q){
     return { n: S.fn === "" ? null : +S.fn, d: S.fd === "" ? null : +S.fd };
   }
   if (m === "choice") return S.choice === undefined ? null : S.choice;
-  if (S.answer === "") return null;
-  const v = parseInt(S.answer, 10);
+  if (S.answer === "" || S.answer === "0.") return null;
+  const v = m === "decimal" ? parseFloat(S.answer) : parseInt(S.answer, 10);
   return S.neg && v !== 0 ? -v : v;
 }
 function givenText(q, g){
   if (g === null) return null;
   if (inputOf(q) === "fraction") return `${g.n === null ? "?" : g.n}/${g.d === null ? "?" : g.d}`;
-  return String(g).replace("-", "−");
+  const shown = q.prefix === "£" ? g.toFixed(2) : String(g).replace("-", "−");
+  return (q.prefix || "") + shown + (q.suffix || "");
 }
 function isRight(q, g){
   if (g === null) return false;
   if (q.check) return !!q.check(g);
   if (inputOf(q) === "fraction")   // any equal fraction counts (2/4 = 1/2)
     return g.n !== null && !!g.d && g.n * q.answer.d === g.d * q.answer.n;
+  if (inputOf(q) === "decimal") return Math.abs(g - q.answer) < 1e-6;
   return g === q.answer;
 }
 function submit(){
@@ -372,8 +377,12 @@ function press(k){
   const col = m === "column";                       // column sums are filled in from the right
   if (k === "del") S.answer = col ? S.answer.slice(1) : S.answer.slice(0, -1);
   else if (k === "ok"){ if (S.answer !== "") submit(); return; }
-  else if (k === "next"){ if (!q.neg) return; S.neg = !S.neg; }
-  else if (S.answer.length < (q.maxLen || 3)) S.answer = col ? k + S.answer : S.answer + k;
+  else if (k === "next"){
+    if (m === "decimal"){ if (!S.answer.includes(".")) S.answer += S.answer === "" ? "0." : "."; }
+    else if (q.neg) S.neg = !S.neg;
+    else return;
+  }
+  else if (S.answer.length < (q.maxLen || (m === "decimal" ? 6 : 3))) S.answer = col ? k + S.answer : S.answer + k;
   renderAnswer();
 }
 function choose(i){
@@ -406,7 +415,7 @@ document.addEventListener("keydown", e => {
   if (/^[0-9]$/.test(e.key)) press(e.key);
   else if (e.key === "Backspace"){ e.preventDefault(); press("del"); }
   else if (e.key === "Enter"){ e.preventDefault(); press("ok"); }
-  else if (e.key === "/" || e.key === "-" || e.key === "ArrowDown" || e.key === "ArrowUp"){ e.preventDefault(); press("next"); }
+  else if (e.key === "/" || e.key === "-" || e.key === "." || e.key === "," || e.key === "ArrowDown" || e.key === "ArrowUp"){ e.preventDefault(); press("next"); }
 });
 $("#quitBtn").addEventListener("click", () => { stopSession(); if (Y4.onQuit) Y4.onQuit(); });
 

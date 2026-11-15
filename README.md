@@ -11,7 +11,8 @@ See [ROADMAP.md](ROADMAP.md) for what is built and what comes next.
 | ➗ Multiplication & Division | `multiply-divide/` | ✅ Built |
 | 🔢 Number & Place Value | `number/` | ✅ Built |
 | ➕ Addition & Subtraction | `add-subtract/` | ✅ Built |
-| 🍕 Fractions, 📏 Measurement, 🔷 Shapes, 📊 Statistics | – | 🚧 Coming soon |
+| 🍕 Fractions & Decimals | `fractions/` | ✅ Built |
+| 📏 Measurement, 🔷 Shapes, 📊 Statistics | – | 🚧 Coming soon |
 
 ---
 
@@ -149,6 +150,21 @@ Wrong answers show the working with a number line or a place value chart.
 | 📖 Word problems | One step: add or subtract? | Two steps, 3-digit numbers | Two steps, 4-digit numbers |
 
 A wrong column sum shows the working column by column, with every carry and exchange.
+
+## 🍕 Fractions & Decimals
+
+| Skill | Level 1 | Level 2 | Level 3 |
+|---|---|---|---|
+| 🍕 Equivalent fractions | ½ = □/8, with fraction bars | 2/3 = □/12 · 6/9 = 2/□ | Which is equal to ¾? · Simplify 8/12 |
+| ➕ Add and subtract fractions | 1/5 + 2/5, with bars | 7/9 − 4/9 | 1 − 3/8 · three fractions · missing number |
+| 🍬 Fraction of an amount | ⅓ of 24 | ¾ of 20 | Word problems, and "¼ of a number is 6" |
+| 🔟 Tenths and hundredths | 3/10 = 0.3 | 47/100 = 0.47 (hundred square) · ¼ ½ ¾ | Counting in tenths and hundredths · how many hundredths in 0.6? |
+| ➗ ÷ 10 and ÷ 100 | 35 ÷ 10 = 3.5 | 35 ÷ 100 = 0.35 | □ ÷ 10 = 4.6 · 63 ÷ □ = 0.63 |
+| ⚖️ Round and compare decimals | Round 3.7 to a whole number | 0.4 ◯ 0.38 | Largest or smallest of four |
+| 💷 Money and measures | £3.45 = □p · £2.35 + £1.40 | Change from £5, £10 or £20 | Two-step change, ribbon lengths, weights |
+
+**Decimal answers:** tap **Decimal point .** to type the point. 3.2 and 3.20 both count.
+Money answers show **£** in the answer box, so only the number is typed.
 
 ---
 

@@ -9,9 +9,12 @@ const KEY = "y4-v1", TT = "ttt-v1";
 
 function read(k){ try { return JSON.parse(localStorage.getItem(k) || "null"); } catch(e){ return null; } }
 function write(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
-function blank(){ return { skills:{}, sound:null }; }
+function blank(){ return { skills:{}, sound:null, days:{}, daily:{ last:null, streak:0, best:0 } }; }
 let data = Object.assign(blank(), read(KEY) || {});
-const today = () => new Date().toISOString().slice(0, 10);
+if (!data.days) data.days = {};
+if (!data.daily) data.daily = blank().daily;
+const dayKey = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;   // local date
+const today = () => dayKey(new Date());
 
 const P = Y4.prog = {
   save(){ write(KEY, data); },
@@ -26,12 +29,44 @@ const P = Y4.prog = {
     return data.skills[id] || (data.skills[id] = { level:1, star:false, seen:0, correct:0, streak:0, last:null, lastDate:null });
   },
   peek(id){ return data.skills[id] || null; },
-  record(id, ok){
+  record(id, ok, ms){
     const s = P.skill(id);
     s.seen++; s.last = ok ? 1 : 0; s.lastDate = today();
     if (ok){ s.correct++; s.streak++; } else s.streak = 0;
+    P.logDay(ok, ms);                                  // saves too
+  },
+  /* answers per day, for the grown-ups' view: { "2026-11-15": { n, ok, ms } } */
+  logDay(ok, ms){
+    const d = data.days[today()] || (data.days[today()] = { n:0, ok:0, ms:0 });
+    d.n++; if (ok) d.ok++; d.ms += Math.min(ms || 0, 60000);     // cap: a question left open doesn't count as an hour
+    const keys = Object.keys(data.days).sort();
+    while (keys.length > 120) delete data.days[keys.shift()];
     P.save();
   },
+  get days(){ return data.days; },
+  /* a times tables fact answered outside the Times Tables page (same rules as that page) */
+  recordFact(a, b, ok, ms){
+    const t = read(TT) || { facts:{}, tables:{}, mock:{ best:null, history:[] }, clock:{ best:0, history:[] }, streak:{ best:0 } };
+    const k = a <= b ? a + "x" + b : b + "x" + a;
+    const f = t.facts[k] || (t.facts[k] = { seen:0, correct:0, streak:0, last:null, times:[] });
+    f.seen++; f.last = ok ? 1 : 0;
+    if (ok){ f.correct++; if (ms <= 6000) f.streak++; } else f.streak = 0;
+    f.times.push(Math.round(ms)); if (f.times.length > 5) f.times.shift();
+    write(TT, t);
+    P.logDay(ok, ms);
+  },
+  /* the daily mix streak: days in a row with a finished daily mix */
+  get daily(){ return data.daily; },
+  dailyDone(){
+    const d = data.daily, t = today(), y = dayKey(new Date(Date.now() - 864e5));
+    if (d.last === t) return false;                   // already done today
+    d.streak = d.last === y ? d.streak + 1 : 1;
+    d.best = Math.max(d.best || 0, d.streak); d.last = t;
+    P.save();
+    return true;
+  },
+  today,
+  dayKey,
   topicStars(topic){ return topic.skills.filter(s => { const r = P.peek(s.id); return r && r.star; }).length; },
 
   /* Times Tables data (read by the main page) */
@@ -42,7 +77,7 @@ const P = Y4.prog = {
   restore(obj){
     if (obj && obj.app === "year4-maths"){
       if (obj.timesTables) write(TT, obj.timesTables);
-      if (obj.year4){ data = Object.assign(blank(), obj.year4); P.save(); }
+      if (obj.year4){ data = Object.assign(blank(), obj.year4); if (!data.days) data.days = {}; if (!data.daily) data.daily = blank().daily; P.save(); }
       return;
     }
     const d = obj && obj.data ? obj.data : obj;             // an older Times Tables backup file

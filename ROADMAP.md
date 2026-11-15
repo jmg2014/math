@@ -146,11 +146,14 @@ first because most other topics depend on them.
 - [x] Bar charts, pictograms, tables and time graphs, drawn from random data
 - [x] "How many more?", "Which is the most?" and "What is the total?" questions
 
-### Phase 8 – Main page extras
+### Phase 8 – Main page extras ✅
+- [x] Curriculum map: every line of `year4_maths_curriculum.md`, coloured not started / learning / mastered (`shared/curriculum.js`)
+- [x] Daily mix and a daily streak 🔥
+- [x] Parent view: time spent, weakest skills, and progress over the weeks
+
+### Ideas for later
 - [ ] Division facts in the Times Tables progress grid
-- [ ] Curriculum map: every line of `year4_maths_curriculum.md`, coloured not started / learning / mastered
-- [ ] Daily mix and a daily streak 🔥
-- [ ] Parent view: time spent, weakest skills, and progress over the weeks
+- [ ] A printable progress report for school
 
 ---
 
@@ -159,6 +162,8 @@ first because most other topics depend on them.
 2. Write `number/skills.js`: the skills, each with 3 levels and a `make(level)` that returns a question
    (see `multiply-divide/skills.js` and the notes at the top of `shared/engine.js`).
 3. On the main page (`index.html`), add `<script src="number/skills.js">` and set `path:"number/"` for that topic.
+   Add the new skills to the matching lines in `shared/curriculum.js`, so they show on the curriculum map
+   and in the daily mix.
 4. Add the new files to `FILES` in `sw.js`, and change the number in `CACHE`.
 
 ## 5. Rules for every new skill

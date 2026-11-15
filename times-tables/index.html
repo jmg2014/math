@@ -200,7 +200,7 @@ const tq = (a,b) => ({ a, b, text:`${a} × ${b} =`, answer:a * b, explain:`${a} 
 const orient = (a,b) => Math.random() < .5 ? tq(a,b) : tq(b,a);
 function allPairs(){ const p = []; for (let a = 2; a <= 12; a++) for (let b = a; b <= 12; b++) p.push([a,b]); return p; }
 // every answer is saved to the facts grid
-const onAnswer = (q, ok, ms) => { record(q.a, q.b, ok, ms); save(); };
+const onAnswer = (q, ok, ms) => { record(q.a, q.b, ok, ms); save(); Y4.prog.logDay(ok, ms); };
 const FACTS = "Facts to practise";
 
 /* ---------- home ---------- */

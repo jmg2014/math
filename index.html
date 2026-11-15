@@ -11,6 +11,40 @@
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="stylesheet" href="shared/style.css">
+<style>
+/* main page only */
+.daily{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;background:var(--accent);color:var(--accent-ink);
+  border-radius:22px;padding:20px 22px;margin:16px 0 6px;box-shadow:0 5px 0 #4b32b8}
+.daily h2{margin:0 0 4px;font-size:1.45rem}
+.daily p{margin:0;opacity:.92}
+.daily .btn{background:#fff;color:#3a2596;border:none;font-size:1.25rem;padding:14px 26px}
+.cmap-sec{margin-top:14px}
+.cmap-sec h3{margin:0 0 6px;font-size:1rem}
+.cline{display:flex;align-items:flex-start;gap:10px;padding:8px 10px;border-radius:10px;color:var(--ink);text-decoration:none;line-height:1.35}
+.cline:hover{background:var(--key)}
+.cline .st{flex:0 0 9.6em;white-space:nowrap;text-align:center;font-size:.8rem;font-weight:800;border-radius:999px;padding:2px 8px;margin-top:1px}
+.st.new{background:var(--grey);color:var(--muted)}
+.st.learning{background:#fbe1a0;color:#6a4a00}
+.st.mastered{background:#a6e5c1;color:#0d5a33}
+.summary-row{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0 2px}
+.summary-row .st{font-size:.95rem;font-weight:800;border-radius:999px;padding:4px 12px}
+details.panel > summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between}
+details.panel > summary::-webkit-details-marker{display:none}
+details.panel > summary h2{margin:0}
+details.panel > summary::after{content:"▾";font-size:1.4rem;color:var(--muted)}
+details[open].panel > summary::after{content:"▴"}
+.wk{position:relative;max-width:560px}
+.wk svg{width:100%;height:auto;display:block}
+.wk-bar{fill:var(--accent)}
+.wk-bar.now{fill:var(--accent)}
+.wk-hit{fill:transparent;cursor:pointer}
+.wk-hit:hover + .wk-bar,.wk-hit.on + .wk-bar{fill:#4b32b8}
+.wk-tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);border-radius:10px;padding:6px 10px;font-size:.9rem;white-space:nowrap;transform:translate(-50%,-110%);display:none}
+.weak{display:grid;gap:8px}
+.weak a{display:flex;justify-content:space-between;gap:10px;background:var(--key);border-radius:12px;padding:10px 12px;color:var(--ink);text-decoration:none}
+.weak small{color:var(--muted)}
+.dtable.small{font-size:.95rem}
+</style>
 </head>
 <body>
 <section id="hub" class="screen active">
@@ -18,7 +52,22 @@
     <h1>🎒 Year 4 Maths</h1>
     <button id="soundBtn" class="ghost" aria-label="Sound on or off">🔊</button>
   </div>
+
+  <div class="daily" id="daily"></div>
+
   <div id="topics" class="modes"></div>
+
+  <details class="panel" id="mapPanel">
+    <summary><div><h2>🗺️ Curriculum map</h2><div id="mapSummary" class="summary-row"></div></div></summary>
+    <p class="muted">Everything a child should know by the end of Year 4. Tap a line to practise it.</p>
+    <div id="cmap"></div>
+  </details>
+
+  <details class="panel" id="parents">
+    <summary><h2>👪 For grown-ups</h2></summary>
+    <div id="parentBody"></div>
+  </details>
+
   <div class="panel">
     <h2>💾 Backup</h2>
     <p class="muted">Progress is saved on this device only. Save a backup file to keep it safe, or to move it to a new address or device.
@@ -35,7 +84,9 @@
 
 <script src="shared/progress.js"></script>
 <script src="shared/engine.js"></script>
-<!-- each built topic's skills, so this page can show its progress -->
+<script src="shared/draw.js"></script>
+<script src="shared/curriculum.js"></script>
+<!-- every topic's skills: for progress, the curriculum map and the daily mix -->
 <script src="multiply-divide/skills.js"></script>
 <script src="number/skills.js"></script>
 <script src="add-subtract/skills.js"></script>
@@ -46,9 +97,9 @@
 <script>
 (function(){
 "use strict";
-const { $, prog:P } = Y4;
+const { $, prog:P, rnd, pick, shuffle } = Y4;
 
-/* The 8 parts of the Year 4 curriculum. `path` is set once a topic is built. */
+/* The 8 parts of the Year 4 curriculum */
 const TOPICS = [
   { id:"times-tables",    emoji:"✖️", name:"Times Tables",              path:"times-tables/",    desc:"All tables to 12 × 12, and the Multiplication Tables Check" },
   { id:"multiply-divide", emoji:"➗", name:"Multiplication & Division", path:"multiply-divide/", desc:"Division facts, factor pairs, written method, sharing problems" },
@@ -57,9 +108,12 @@ const TOPICS = [
   { id:"fractions",       emoji:"🍕", name:"Fractions & Decimals",      path:"fractions/",       desc:"Equivalent fractions, tenths and hundredths, ¾ of 20" },
   { id:"measurement",     emoji:"📏", name:"Measurement",               path:"measurement/",     desc:"Units, perimeter, area, money, time" },
   { id:"shapes",          emoji:"🔷", name:"Shapes & Position",         path:"shapes/",          desc:"Triangles, angles, symmetry, coordinates" },
-  { id:"statistics",      emoji:"📊", name:"Statistics",                path:"statistics/",      desc:"Bar charts, pictograms, tables" }
+  { id:"statistics",      emoji:"📊", name:"Statistics",                path:"statistics/",      desc:"Bar charts, pictograms, tables, time graphs" }
 ];
+const allSkills = () => Y4.TOPICS.flatMap(T => T.skills.map(s => ({ s, T })));
+const HARD = [6, 7, 8, 9, 12];
 
+/* ---------- topic tiles ---------- */
 function ttProgress(){
   const d = P.timesTables();
   if (!d) return "Not started yet";
@@ -67,27 +121,185 @@ function ttProgress(){
   const best = d.mock && d.mock.best !== null && d.mock.best !== undefined ? ` · best mock ${d.mock.best}/25` : "";
   return `⭐ ${stars} of 11 tables${best}`;
 }
-function render(){
+function renderTopics(){
   $("#topics").innerHTML = TOPICS.map(t => {
-    if (!t.path) return `<div class="mode soon"><span class="emoji">${t.emoji}</span><b>${t.name}</b><small>${t.desc}</small><small>🚧 Coming soon</small></div>`;
     let p;
     if (t.id === "times-tables") p = ttProgress();
     else { const topic = Y4.TOPICS.find(x => x.id === t.id); p = `⭐ ${P.topicStars(topic)} of ${topic.skills.length} skills`; }
     return `<a class="mode ${t.id === "times-tables" ? "main" : ""}" href="${t.path}"><span class="emoji">${t.emoji}</span><b>${t.name}</b><small>${t.desc}</small><small><b style="font-size:1rem;color:var(--ink)">${p}</b></small></a>`;
   }).join("");
+}
+
+/* ---------- curriculum map ---------- */
+const LABEL = { new:"○ Not started", learning:"◐ Learning", mastered:"✓ Mastered" };
+function renderMap(){
+  let html = "", count = { new:0, learning:0, mastered:0 }, total = 0;
+  for (const sec of Y4.CURRICULUM){
+    html += `<div class="cmap-sec"><h3>${sec.title}</h3>`;
+    for (const [text, ids] of sec.lines){
+      const st = Y4.lineStatus(ids); count[st]++; total++;
+      const href = ids[0] === "TT" ? "times-tables/" : `${sec.topic}/#${ids[0]}`;
+      html += `<a class="cline" href="${href}"><span class="st ${st}">${LABEL[st]}</span><span>${text}</span></a>`;
+    }
+    html += `</div>`;
+  }
+  $("#cmap").innerHTML = html;
+  $("#mapSummary").innerHTML = `<span class="st mastered">✓ ${count.mastered} of ${total} mastered</span>
+    <span class="st learning">◐ ${count.learning} learning</span><span class="st new">○ ${count.new} not started</span>`;
+}
+
+/* ---------- today's mix ---------- */
+function renderDaily(){
+  const d = P.daily, done = d.last === P.today(), yesterday = P.dayKey(new Date(Date.now() - 864e5));
+  const streak = done || d.last === yesterday ? d.streak : 0;
+  const line = done ? `✓ Done today! 🔥 ${streak} day${streak === 1 ? "" : "s"} in a row. Want another one?`
+             : streak ? `Keep your 🔥 ${streak}-day streak going!`
+             : "12 questions from all your topics, picked to help you most.";
+  $("#daily").innerHTML = `<div><h2>🌞 Today's mix</h2><p>${line}</p></div><button class="btn" id="mixBtn">${done ? "Play again" : "Start"} ▶</button>`;
+  $("#mixBtn").onclick = startMix;
+}
+function ttQuestion(){
+  // a fact from the times tables: ones that were wrong or are still being learnt come first
+  const t = P.timesTables(), weak = [];
+  if (t && t.facts) for (const [k, f] of Object.entries(t.facts)) if (f.seen && (f.last === 0 || f.streak < 3)) weak.push(k.split("x").map(Number));
+  let [a, b] = weak.length && Math.random() < .75 ? pick(weak) : [pick(HARD), rnd(2, 12)];
+  if (Math.random() < .5) [a, b] = [b, a];
+  return { text:`${a} × ${b} =`, answer:a * b, explain:`${a} × ${b} = <b>${a * b}</b>`, solution:`${a} × ${b} = ${a * b}`, _fact:[a, b], key:`${a}x${b}`, tag:"✖️ Times tables" };
+}
+function buildMix(){
+  const pool = allSkills().map(({ s, T }) => {
+    const r = P.peek(s.id), st = Y4.skillStatus(s.id);
+    if (st === "new") return { s, T, w:1, lv:1, isNew:true };
+    if (st === "mastered"){                            // review it if it hasn't been practised for a week
+      const days = r && r.lastDate ? (Date.now() - new Date(r.lastDate)) / 864e5 : 99;
+      return { s, T, w:days >= 7 ? 3 : .5, lv:3 };
+    }
+    return { s, T, w:r.last === 0 ? 6 : 4, lv:r.level };   // still learning: most of the mix
+  });
+  const qs = [], per = {}, keys = new Set();
+  let news = 0, guard = 0;
+  while (qs.length < 10 && guard++ < 800){
+    // at most 2 questions per skill and 2 new skills, unless there aren't enough skills to fill the mix (a new player)
+    const strict = guard < 300;
+    const [p] = Y4.weightedPick(pool, pool.map(x => x.w), 1);
+    if ((per[p.s.id] || 0) >= (strict ? 2 : 3) || (strict && p.isNew && !per[p.s.id] && news >= 2)) continue;
+    let q; try { q = p.s.make(p.lv); } catch(e){ continue; }
+    if (keys.has(q.key || q.text)) continue;
+    keys.add(q.key || q.text);
+    if (p.isNew && !per[p.s.id]) news++;
+    per[p.s.id] = (per[p.s.id] || 0) + 1;
+    qs.push(Object.assign(q, { _skill:p.s.id, tag:`${p.T.emoji} ${p.s.name}` }));
+  }
+  qs.push(ttQuestion(), ttQuestion());
+  return shuffle(qs);
+}
+Y4._buildMix = buildMix;                               // for testing
+function startMix(){
+  Y4.startSession({ title:"🌞 Today's mix", questions:buildMix(), feedback:true, requeue:true, maxQ:15, waitOnWrong:true, okDelay:900,
+    onAnswer:(q, ok, ms) => q._fact ? P.recordFact(q._fact[0], q._fact[1], ok, ms) : P.record(q._skill, ok, ms),
+    onFinish:finishMix });
+}
+function finishMix(res){
+  const first = res.filter(r => !r.q.retry), score = first.filter(r => r.ok).length;
+  const fresh = P.dailyDone(), d = P.daily;
+  const msg = (fresh ? `🔥 ${d.streak} day${d.streak === 1 ? "" : "s"} in a row! ` : "") +
+    (score === first.length ? "Every one right. Brilliant!" : score >= first.length * .75 ? "Great work!" : "Good practice. The tricky ones will come back tomorrow.");
+  Y4.showResults({ title:fresh ? "Today's mix done! 🌞" : "Mix done! 🌞", score:`${score} / ${first.length}`, msg, missed:res.filter(r => !r.ok),
+    buttons:[["Another mix", startMix, ""], ["Home", goHome, "primary"]], celebrate:fresh });
+}
+function goHome(){ Y4.stopSession(); renderAll(); Y4.show("hub"); }
+Y4.onQuit = goHome;
+
+/* ---------- for grown-ups ---------- */
+const mins = ms => Math.round(ms / 60000);
+function mondayOf(key){ const d = new Date(key + "T12:00"); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return P.dayKey(d); }
+function weeks(n){
+  const out = [], start = new Date(mondayOf(P.today()) + "T12:00");
+  for (let i = n - 1; i >= 0; i--){ const d = new Date(start); d.setDate(d.getDate() - 7 * i); out.push({ key:P.dayKey(d), n:0, ok:0, ms:0 }); }
+  for (const [k, v] of Object.entries(P.days)){ const w = out.find(x => x.key === mondayOf(k)); if (w){ w.n += v.n; w.ok += v.ok; w.ms += v.ms; } }
+  return out;
+}
+const shortDate = key => new Date(key + "T12:00").toLocaleDateString(undefined, { day:"numeric", month:"short" });
+/* weekly answers: one series, so no legend; a tooltip on each bar and a table view underneath */
+function weekChart(ws){
+  const W = 560, H = 190, left = 40, top = 14, bottom = 30, pw = (W - left - 8) / ws.length, bw = Math.min(40, pw * .55);
+  const max = Math.max(10, ...ws.map(w => w.n)), step = Math.pow(10, Math.floor(Math.log10(max))) * (max / Math.pow(10, Math.floor(Math.log10(max))) > 5 ? 2 : 1);
+  const top2 = Math.ceil(max / step) * step, y = v => top + (H - top - bottom) * (1 - v / top2);
+  let s = "";
+  for (let v = 0; v <= top2; v += step) s += `<line x1="${left}" y1="${y(v)}" x2="${W - 4}" y2="${y(v)}" class="ch-grid"/><text x="${left - 6}" y="${y(v) + 4}" class="ch-num" style="text-anchor:end;font-size:12px">${v}</text>`;
+  ws.forEach((w, i) => {
+    const cx = left + pw * i + pw / 2, x = cx - bw / 2, yy = y(w.n), h = y(0) - yy, r = Math.min(4, h / 2);
+    const tip = `Week of ${shortDate(w.key)}: ${w.n} answer${w.n === 1 ? "" : "s"}${w.n ? `, ${Math.round(w.ok / w.n * 100)}% right, ${mins(w.ms)} min` : ""}`;
+    s += `<rect x="${cx - pw / 2}" y="${top}" width="${pw}" height="${H - top - bottom}" class="wk-hit" data-tip="${tip}"/>`;
+    s += h > 0 ? `<path d="M${x},${y(0)} V${yy + r} Q${x},${yy} ${x + r},${yy} H${x + bw - r} Q${x + bw},${yy} ${x + bw},${yy + r} V${y(0)} Z" class="wk-bar"/>` : `<g></g>`;
+    s += `<text x="${cx}" y="${H - 10}" class="ch-num" style="text-anchor:middle;font-size:12px">${shortDate(w.key)}</text>`;
+  });
+  s += `<line x1="${left}" y1="${y(0)}" x2="${W - 4}" y2="${y(0)}" class="ch-axis" style="stroke-width:1.5"/>`;
+  return `<div class="wk"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Answers each week for the last ${ws.length} weeks">${s}</svg><div class="wk-tip"></div></div>`;
+}
+function renderParents(){
+  const days = P.days, keys = Object.keys(days).sort();
+  const last7 = keys.filter(k => (Date.now() - new Date(k + "T12:00")) / 864e5 < 7).map(k => days[k]);
+  const sum = (arr, f) => arr.reduce((a, x) => a + x[f], 0);
+  const n7 = sum(last7, "n"), ok7 = sum(last7, "ok"), ms7 = sum(last7, "ms");
+  const ws = weeks(8);
+
+  // weakest skills: tried at least 5 times, lowest share right first
+  const weak = allSkills().map(({ s, T }) => ({ s, T, r:P.peek(s.id) })).filter(x => x.r && x.r.seen >= 5 && !x.r.star)
+    .sort((a, b) => a.r.correct / a.r.seen - b.r.correct / b.r.seen).slice(0, 5);
+  // trickiest times tables facts
+  const t = P.timesTables(), facts = t && t.facts ? Object.entries(t.facts).filter(([, f]) => f.seen && f.streak < 3)
+    .sort((a, b) => (a[1].correct / a[1].seen) - (b[1].correct / b[1].seen)).slice(0, 6) : [];
+
+  $("#parentBody").innerHTML = `
+    <div class="records" style="margin-top:12px">
+      <div class="rec"><small>Last 7 days</small><b>${n7}</b> <small>questions answered</small></div>
+      <div class="rec"><small>Right first time</small><b>${n7 ? Math.round(ok7 / n7 * 100) + "%" : "–"}</b><small>last 7 days</small></div>
+      <div class="rec"><small>Time answering</small><b>${mins(ms7)}</b> <small>minutes, last 7 days</small></div>
+      <div class="rec"><small>Daily mix streak</small><b>${P.daily.streak || 0}</b> <small>best ${P.daily.best || 0} days</small></div>
+    </div>
+    <h3>Questions answered each week</h3>
+    ${weekChart(ws)}
+    <details style="margin-top:6px"><summary class="muted" style="cursor:pointer">Show as a table</summary>
+      ${Y4.draw.table(["Week of", "Answers", "Right", "Minutes"], ws.slice().reverse().map(w => [shortDate(w.key), w.n, w.n ? Math.round(w.ok / w.n * 100) + "%" : "–", mins(w.ms)])).replace('class="dtable"', 'class="dtable small"')}
+    </details>
+    <h3>Skills that need the most help</h3>
+    ${weak.length ? `<div class="weak">${weak.map(({ s, T, r }) => `<a href="${T.id}/#${s.id}"><span>${T.emoji} ${s.name}<br><small>${T.title} · level ${r.level} of 3</small></span>
+      <span style="text-align:right"><b>${Math.round(r.correct / r.seen * 100)}%</b><br><small>of ${r.seen} right</small></span></a>`).join("")}</div>`
+      : `<p class="muted">Not enough answers yet. This fills in after a few sessions.</p>`}
+    <h3>Trickiest times tables facts</h3>
+    ${facts.length ? `<div class="chips" style="justify-content:flex-start">${facts.map(([k, f]) => `<span class="chip"><b>${k.replace("x", " × ")}</b><small>${f.correct} of ${f.seen} right</small></span>`).join("")}</div>`
+      : `<p class="muted">None yet. Play Tricky Facts or the Mock Check to fill this in.</p>`}
+    <p class="muted" style="margin-top:14px">Time answering counts the time spent on each question (up to a minute each), so it is a little less than time in the app.</p>`;
+  // tooltip on the weekly bars (hover, or tap on the tablet)
+  const box = $("#parentBody .wk"), tipEl = box.querySelector(".wk-tip");
+  box.querySelectorAll(".wk-hit").forEach(h => {
+    const show = () => {
+      box.querySelectorAll(".wk-hit.on").forEach(o => o.classList.remove("on")); h.classList.add("on");
+      const b = h.getBoundingClientRect(), o = box.getBoundingClientRect();
+      tipEl.textContent = h.dataset.tip; tipEl.style.display = "block";
+      tipEl.style.left = Math.min(Math.max(b.left - o.left + b.width / 2, 90), o.width - 90) + "px"; tipEl.style.top = "40px";
+    };
+    h.addEventListener("pointerenter", show); h.addEventListener("click", show);
+    h.addEventListener("pointerleave", () => { h.classList.remove("on"); tipEl.style.display = "none"; });
+  });
+}
+
+function renderAll(){
+  renderDaily(); renderTopics(); renderMap(); renderParents();
   $("#soundBtn").textContent = P.sound ? "🔊" : "🔇";
 }
 
-$("#soundBtn").addEventListener("click", () => { P.sound = !P.sound; render(); });
+$("#soundBtn").addEventListener("click", () => { P.sound = !P.sound; renderAll(); });
 $("#resetBtn").addEventListener("click", () => {
-  if (confirm("Reset ALL progress in every topic (stars, scores, facts)? This cannot be undone.")){ P.resetAll(); render(); }
+  if (confirm("Reset ALL progress in every topic (stars, scores, facts)? This cannot be undone.")){ P.resetAll(); location.reload(); }
 });
 
 /* ---------- backup & restore ---------- */
 function backupMsg(t){ $("#backupMsg").textContent = t; }
 $("#backupBtn").addEventListener("click", () => {
   try {
-    const stamp = new Date().toISOString().slice(0, 10);
+    const stamp = P.today();
     const file = JSON.stringify(P.backup(), null, 1);
     const url = URL.createObjectURL(new Blob([file], { type:"application/json" }));
     const a = document.createElement("a");
@@ -106,12 +318,12 @@ $("#restoreFile").addEventListener("change", async e => {
   try { obj = JSON.parse(await f.text()); } catch(err){ backupMsg("That file is not a Year 4 Maths backup."); return; }
   const when = obj && obj.savedAt ? new Date(obj.savedAt).toLocaleString() : "an unknown date";
   if (!confirm(`Replace the progress on this device with the backup from ${when}?`)) return;
-  try { P.restore(obj); render(); backupMsg("✓ Progress restored."); }
+  try { P.restore(obj); renderAll(); backupMsg("✓ Progress restored."); }
   catch(err){ backupMsg("That file is not a Year 4 Maths backup."); }
 });
 
 Y4.registerOffline("sw.js");
-render();
+renderAll();
 })();
 </script>
 </body>

@@ -22,7 +22,8 @@ Y4.openTopic = function(id){
   <div class="tabs" id="tabs"></div>
   <div id="skillPanel" class="panel"></div>
 </section>`);
-  cur = T.skills.find(s => s.id === recall()) || T.skills[0];
+  // a link like fractions/#fr-tenths opens that skill's tab (used by the curriculum map)
+  cur = T.skills.find(s => s.id === location.hash.slice(1)) || T.skills.find(s => s.id === recall()) || T.skills[0];
   Y4.onQuit = renderTopic;
   $("#tabs").addEventListener("click", e => {
     const b = e.target.closest("[data-s]"); if (!b) return;
@@ -77,7 +78,7 @@ function start(skill, lv){
   }
   Y4.startSession({ title:`${skill.name} · Level ${lv}`, questions, feedback:true,
     requeue:true, maxQ:ROUND + 4, waitOnWrong:true, okDelay:900,
-    onAnswer:(q, ok) => P.record(skill.id, ok),
+    onAnswer:(q, ok, ms) => P.record(skill.id, ok, ms),
     onFinish:res => finish(skill, lv, res) });
 }
 

@@ -97,7 +97,15 @@ Saving a backup now and then is also a good idea in case the browser's data gets
 ---
 
 ## The main page
+- **🌞 Today's mix:** 12 questions from all the topics: mostly skills being learnt (especially recent mistakes),
+  2 new skills to try, mastered skills that haven't been practised for a week, and 2 tricky times tables facts.
+  Doing it on days in a row builds a 🔥 streak. It can be played more than once a day.
 - **Topic tiles:** one for each part of the curriculum, showing the stars earned so far.
+- **🗺️ Curriculum map:** every line of the Year 4 curriculum, marked ○ not started, ◐ learning or ✓ mastered
+  (mastered = a ⭐ in every skill for that line). Tap a line to go straight to its practice.
+- **👪 For grown-ups:** questions answered, % right first time and minutes spent in the last 7 days; a chart of
+  questions answered each week (tap a bar for details, or show it as a table); the skills that need the most help;
+  and the trickiest times tables facts.
 - **🔊 button:** turns sound on or off for every topic.
 - **💾 Backup:** saves all progress to a file, or restores it from one.
 - **Reset ALL progress:** clears every topic and starts again.

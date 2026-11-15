@@ -18,6 +18,7 @@
      neg       true to show a "minus" key, for negative answers
      explain   HTML shown when the answer is wrong
      solution  short text for the "to practise" list on the results screen
+     tag       optional: shown after the title in the top bar
 */
 (function(){
 "use strict";
@@ -246,6 +247,7 @@ function nextQuestion(){
   }
   S.loaded = false;
   document.body.classList.remove("loading");
+  $("#playTitle").textContent = q.tag ? `${S.title} · ${q.tag}` : S.title;   // e.g. which skill a daily mix question is from
   updateProgress();
   const mode = inputOf(q), qt = $("#qtext");
   qt.innerHTML = q.text || "";

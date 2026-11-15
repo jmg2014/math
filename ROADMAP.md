@@ -165,6 +165,12 @@ Checked every statutory Year 4 statement on GOV.UK; `year4_maths_curriculum.md` 
 - [x] Lines of symmetry in different orientations (turned shapes, slanting mirror lines)
 - [x] Presenting data: drawing bar charts and plotting time graphs (Make a chart skill, `input:"bars"`)
 
+### Phase 10 – Regular use covers everything ✅
+- [x] Counting down as well as up in tenths and hundredths
+- [x] The value of each digit in the answer to ÷ 10 and ÷ 100 (ones, tenths, hundredths)
+- [x] The daily mix unlocks levels (4 right in a row) and stars (6 right in a row at level 3), so the mix alone
+      works through every skill; simulated: every skill met in ~2 months, every ⭐ in ~5–6 months at 85% right
+
 ### Ideas for later
 - [x] Division facts in the Times Tables progress grid (a ÷ grid next to the × grid)
 - [ ] A printable progress report for school

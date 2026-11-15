@@ -100,6 +100,10 @@ Saving a backup now and then is also a good idea in case the browser's data gets
 - **🌞 Today's mix:** 12 questions from all the topics: mostly skills being learnt (especially recent mistakes),
   2 new skills to try, mastered skills that haven't been practised for a week, and 2 tricky times tables facts.
   Doing it on days in a row builds a 🔥 streak. It can be played more than once a day.
+  The mix also moves skills on: **4 right in a row** at a skill's level unlocks the next level, and **6 right in a row**
+  at level 3 earns its ⭐, so doing only the daily mix still works through every skill up to the hardest level.
+  (In a simulation of a child getting 85% right, one mix a day met every skill within about 2 months and earned every
+  ⭐ in about 5–6 months. Playing rounds on the topic pages, or a second mix, is faster.)
 - **Topic tiles:** one for each part of the curriculum, showing the stars earned so far.
 - **🗺️ Curriculum map:** every one of the 42 Year 4 curriculum statements, marked ○ not started, ◐ learning or ✓ mastered
   (mastered = a ⭐ in every skill for that line). Tap a line to go straight to its practice.
@@ -172,8 +176,8 @@ A wrong column sum shows the working column by column, with every carry and exch
 | 🍕 Equivalent fractions | ½ = □/8, with fraction bars | 2/3 = □/12 · 6/9 = 2/□ | Which is equal to ¾? · Simplify 8/12 |
 | ➕ Add and subtract fractions | 1/5 + 2/5, with bars | 7/9 − 4/9 | 1 − 3/8 · three fractions · missing number |
 | 🍬 Fraction of an amount | ⅓ of 24 | ¾ of 20 | Word problems, and "¼ of a number is 6" |
-| 🔟 Tenths and hundredths | 3/10 = 0.3 | 47/100 = 0.47 (hundred square) · ¼ ½ ¾ | Counting in tenths and hundredths · how many hundredths in 0.6? |
-| ➗ ÷ 10 and ÷ 100 | 35 ÷ 10 = 3.5 | 35 ÷ 100 = 0.35 · 0.3 ÷ 10 = 0.03 | □ ÷ 10 = 4.6 · 63 ÷ □ = 0.63 |
+| 🔟 Tenths and hundredths | 3/10 = 0.3 | 47/100 = 0.47 (hundred square) · ¼ ½ ¾ | Counting up and down in tenths and hundredths · how many hundredths in 0.6? |
+| ➗ ÷ 10 and ÷ 100 | 35 ÷ 10 = 3.5 · what is each digit worth? | 35 ÷ 100 = 0.35 · 0.3 ÷ 10 = 0.03 | □ ÷ 10 = 4.6 · 63 ÷ □ = 0.63 |
 | ⚖️ Round and compare decimals | Round 3.7 to a whole number | 0.4 ◯ 0.38 | Largest or smallest of four |
 | 💷 Money and measures | £3.45 = □p · £2.35 + £1.40 | Change from £5, £10 or £20 | Two-step change, ribbon lengths, weights |
 

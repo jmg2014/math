@@ -141,7 +141,7 @@ const tenths = {
   levels:[
     { name:"Tenths", desc:"3/10 = 0.3" },
     { name:"Hundredths, ¼, ½, ¾", desc:"47/100 = 0.47   ·   ¾ = 0.75" },
-    { name:"Counting and how many", desc:"0.98, 0.99, □   ·   How many hundredths in 0.6?" }
+    { name:"Counting and how many", desc:"Count up and down: 0.98, 0.99, □ · 1.01, 1.00, □ · hundredths in 0.6?" }
   ],
   make(lv){
     if (lv === 1){
@@ -172,13 +172,16 @@ const tenths = {
     }
     const form = rnd(1, 3);
     if (form === 1){                                  // count in tenths or hundredths, across a whole number
-      const step = Math.random() < .5 ? 1 : 10, whole = rnd(0, 4);
-      const endAt = whole * 100 + 100 + (Math.random() < .5 ? 0 : step);        // in hundredths
-      const terms = [3, 2, 1, 0].map(i => endAt - i * step);
+      const step = Math.random() < .5 ? 1 : 10, whole = rnd(0, 4), down = Math.random() < .5;   // counting up or down
+      const cross = whole * 100 + 100;                                            // the whole number it passes, in hundredths
+      const start = down ? cross + rnd(1, 2) * step : cross + rnd(0, 1) * step;   // picked once for the whole sequence
+      const terms = down ? [0, 1, 2, 3].map(i => start - i * step)                  // e.g. 1.02, 1.01, 1.00, 0.99
+                         : [3, 2, 1, 0].map(i => start - i * step);                 // e.g. 0.98, 0.99, 1.00, 1.01
       const gap = rnd(1, 3);
       const show = terms.map((t, i) => i === gap ? "□" : (t / 100).toFixed(step === 10 ? 1 : 2)).join(", ");
+      const how = step === 1 ? `hundredths: ${down ? "− 0.01" : "+ 0.01"}` : `tenths: ${down ? "− 0.1" : "+ 0.1"}`;
       return { text:show, input:"decimal", answer:terms[gap] / 100, key:show,
-        explain:`<b>${dec(terms[gap] / 100)}</b><span class="why">Counting in ${step === 1 ? "hundredths: + 0.01" : "tenths: + 0.1"} each time. ${step === 1 ? "After 0.99 hundredths comes the next whole number." : ""}</span>`,
+        explain:`<b>${dec(terms[gap] / 100)}</b><span class="why">Counting ${down ? "down" : "up"} in ${how} each time. ${step === 1 ? (down ? "Before 1.00 comes 0.99: one hundredth less than a whole." : "After 0.99 comes the next whole number.") : ""}</span>`,
         solution:terms.map(t => dec(t / 100)).join(", ") };
     }
     if (form === 2){
@@ -197,11 +200,23 @@ const divide = {
   id:"fr-divide", name:"÷ 10 and ÷ 100", emoji:"➗",
   desc:"When you divide by 10, every digit moves one place to the right: ones become tenths, and tenths become hundredths. When you divide by 100, every digit moves two places to the right.",
   levels:[
-    { name:"÷ 10", desc:"7 ÷ 10 = 0.7   ·   35 ÷ 10 = 3.5" },
+    { name:"÷ 10", desc:"35 ÷ 10 = 3.5 · what is the 5 worth in the answer?" },
     { name:"÷ 100, and tenths ÷ 10", desc:"35 ÷ 100 = 0.35   ·   0.3 ÷ 10 = 0.03" },
     { name:"Missing numbers", desc:"□ ÷ 10 = 4.6   ·   63 ÷ □ = 0.63" }
   ],
   make(lv){
+    if (Math.random() < .3){                          // the value of each digit in the answer: ones, tenths, hundredths
+      const by = lv === 1 ? 10 : pick([10, 100]);
+      let n; do { n = rnd(11, 99); } while (n % 10 === 0 || Math.floor(n / 10) === n % 10);
+      const tens = Math.floor(n / 10), ones = n % 10, which = pick(["tens", "ones"]), d = which === "tens" ? tens : ones;
+      const PLACE = by === 10 ? { tens:"ones", ones:"tenths" } : { tens:"tenths", ones:"hundredths" };
+      const say = (k, place) => `${k} ${k === 1 ? place.replace(/s$/, "") : place}`;
+      const right = say(d, PLACE[which]), r = dec(n / by);
+      return { text:`${n} ÷ ${by} = ${r}. What is the ${d} worth in the answer?`, input:"choice",
+        choices:["tens", "ones", "tenths", "hundredths"].map(pl => say(d, pl)), answer:right, key:`dv${n}/${by}${which}`,
+        explain:`<b>${right}</b><span class="why">The ${d} was ${say(d, which)}; dividing by ${by} moved it ${by === 10 ? "one place" : "two places"} to the right.</span>${Y4.draw.decimalChart([[n, ""], [r, `÷ ${by}`]])}`,
+        solution:`In ${r}, the ${d} is ${right}` };
+    }
     if (lv > 1 && Math.random() < .35){              // tenths ÷ 10 make hundredths: 0.3 ÷ 10 = 0.03, 4.7 ÷ 10 = 0.47
       const t = Math.random() < .5 ? rnd(1, 9) : rnd(11, 99), v = dec(t / 10), r = dec(t / 100);
       return { text:`${v} ÷ 10 =`, input:"decimal", answer:t / 100, key:`t${t}/10`,

@@ -65,6 +65,19 @@ const P = Y4.prog = {
     if (ok){ f.correct++; if (ms <= 10000) f.streak++; } else f.streak = 0;
     write(TT, t);
   },
+  /* Levels can also move on in the daily mix: 4 right in a row at a skill's current level unlocks the next level,
+     and 6 right in a row at level 3 earns the ⭐. Returns a message when something is unlocked, otherwise null. */
+  mixProgress(id, lv, ok, name){
+    const s = P.skill(id);
+    if (s.mixLv !== s.level){ s.mixLv = s.level; s.mixRun = 0; }      // a new level (maybe from a topic page): start counting again
+    if (lv !== s.level || s.star && s.level === 3) return null;        // only questions at the skill's current level count
+    s.mixRun = ok ? (s.mixRun || 0) + 1 : 0;
+    let msg = null;
+    if (s.level < 3 && s.mixRun >= 4){ s.level++; s.mixLv = s.level; s.mixRun = 0; msg = `🔓 ${name}: level ${s.level} unlocked!`; }
+    else if (s.level === 3 && !s.star && s.mixRun >= 6){ s.star = true; s.mixRun = 0; msg = `⭐ ${name} mastered!`; }
+    P.save();
+    return msg;
+  },
   /* the daily mix streak: days in a row with a finished daily mix */
   get daily(){ return data.daily; },
   dailyDone(){

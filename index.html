@@ -188,16 +188,19 @@ function buildMix(){
     keys.add(q.key || q.text);
     if (p.isNew && !per[p.s.id]) news++;
     per[p.s.id] = (per[p.s.id] || 0) + 1;
-    qs.push(Object.assign(q, { _skill:p.s.id, tag:`${p.T.emoji} ${p.s.name}` }));
+    qs.push(Object.assign(q, { _skill:p.s.id, _lv:p.lv, _name:p.s.name, tag:`${p.T.emoji} ${p.s.name}` }));
   }
   qs.push(ttQuestion(), ttQuestion());
   return shuffle(qs);
 }
 Y4._buildMix = buildMix;                               // for testing
+let unlocked = [];                                     // levels and stars won during this mix
 function startMix(){
+  unlocked = [];
   Y4.startSession({ title:"🌞 Today's mix", questions:buildMix(), feedback:true, requeue:true, maxQ:15, waitOnWrong:true, okDelay:900,
     onAnswer:(q, ok, ms) => {
       if (q._fact) P.recordFact(q._fact[0], q._fact[1], ok, ms); else P.record(q._skill, ok, ms);
+      if (q._skill && !q.retry){ const m = P.mixProgress(q._skill, q._lv, ok, q._name); if (m) unlocked.push(m); }   // retries don't count
       if (q.div) P.recordDivFact(q.div[0], q.div[1], ok, ms);   // division facts also go on the ÷ grid
     },
     onFinish:finishMix });
@@ -207,8 +210,8 @@ function finishMix(res){
   const fresh = P.dailyDone(), d = P.daily;
   const msg = (fresh ? `🔥 ${d.streak} day${d.streak === 1 ? "" : "s"} in a row! ` : "") +
     (score === first.length ? "Every one right. Brilliant!" : score >= first.length * .75 ? "Great work!" : "Good practice. The tricky ones will come back tomorrow.");
-  Y4.showResults({ title:fresh ? "Today's mix done! 🌞" : "Mix done! 🌞", score:`${score} / ${first.length}`, msg, missed:res.filter(r => !r.ok),
-    buttons:[["Another mix", startMix, ""], ["Home", goHome, "primary"]], celebrate:fresh });
+  Y4.showResults({ title:fresh ? "Today's mix done! 🌞" : "Mix done! 🌞", score:`${score} / ${first.length}`, msg:unlocked.length ? `${msg} ${unlocked.join(" · ")}` : msg,
+    missed:res.filter(r => !r.ok), buttons:[["Another mix", startMix, ""], ["Home", goHome, "primary"]], celebrate:fresh || unlocked.length > 0 });
 }
 function goHome(){ Y4.stopSession(); renderAll(); Y4.show("hub"); }
 Y4.onQuit = goHome;

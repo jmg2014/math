@@ -67,7 +67,7 @@ Each skill is one small **generator** that returns a new question each time:
 
 | Input | Used for |
 |---|---|
-| Number keypad (the current one, plus a − key) | most questions, including negative numbers |
+| Number keypad, with a "Make it negative −" key when needed (`neg:true`) | most questions, including negative numbers |
 | Fraction keypad (top / bottom) | sharing problems, equivalent fractions |
 | Decimal and money keypad (with `.` and `£`) | decimals, money |
 | Clock (drag the hands, or type a digital time) | time |
@@ -104,14 +104,14 @@ first because most other topics depend on them.
 - [x] Written method: 2- and 3-digit × 1-digit, shown laid out in columns
 - [x] **Sharing problems:** "3 cakes shared between 10 children" → 3/10, with the cakes drawn and sliced
 
-### Phase 2 – Number & place value
-- [ ] Count in 6s, 7s, 9s, 25s and 1000s (fill in the missing number in a sequence)
-- [ ] 1000 more or less
-- [ ] Negative numbers on a number line (count back through zero)
-- [ ] Value of a digit in a 4-digit number
-- [ ] Compare and order numbers beyond 1000
-- [ ] Round to the nearest 10, 100 or 1000
-- [ ] Roman numerals up to 100, both ways
+### Phase 2 – Number & place value ✅
+- [x] Count in 6s, 7s, 9s, 25s and 1000s (fill in the missing number in a sequence)
+- [x] 1000 more or less
+- [x] Negative numbers on a number line (count back through zero)
+- [x] Value of a digit in a 4-digit number
+- [x] Compare and order numbers beyond 1000
+- [x] Round to the nearest 10, 100 or 1000
+- [x] Roman numerals up to 100, both ways
 
 ### Phase 3 – Addition & subtraction
 - [ ] Column addition and subtraction up to 4 digits, entered one column at a time

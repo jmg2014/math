@@ -9,7 +9,8 @@ See [ROADMAP.md](ROADMAP.md) for what is built and what comes next.
 |---|---|---|
 | ✖️ Times Tables | `times-tables/` | ✅ Built |
 | ➗ Multiplication & Division | `multiply-divide/` | ✅ Built |
-| 🔢 Number, ➕ Add & Subtract, 🍕 Fractions, 📏 Measurement, 🔷 Shapes, 📊 Statistics | – | 🚧 Coming soon |
+| 🔢 Number & Place Value | `number/` | ✅ Built |
+| ➕ Add & Subtract, 🍕 Fractions, 📏 Measurement, 🔷 Shapes, 📊 Statistics | – | 🚧 Coming soon |
 
 ---
 
@@ -116,6 +117,23 @@ A wrong answer shows the working and waits for **Next ▶**. A similar question 
 
 **Fraction answers:** type the top number, then tap **Bottom number ⬇** (or Enter) and type the bottom number.
 Equal fractions count as right, so 2/4 is accepted for 1/2.
+
+## 🔢 Number & Place Value
+
+Works the same way as Multiplication & Division: one tab for each skill, 3 levels, a ⭐ for each skill.
+
+| Skill | Level 1 | Level 2 | Level 3 |
+|---|---|---|---|
+| 🦘 Counting in steps | 6, 12, □, 24 (6s, 7s, 9s) | 25s and 1000s, forwards and back | Any step, either way |
+| ⬆️ 1000 more or less | 100 more than 452 | 1000 less than 6371 | 100 more than 3950; working backwards |
+| 🌡️ Negative numbers | Count back past 0 on a number line | 6, 3, 0, −3, □ | Temperatures: colder, warmer, difference |
+| 🏠 Place value | Value of the 7 in 3742 | 3742 = 3000 + □ + 40 + 2 | 4 thousands and 7 tens; jumbled parts |
+| ⚖️ Compare and order | Which is bigger? | 4352 ◯ 4325 (<, > or =) | Smallest or largest of four |
+| 🎯 Rounding | Nearest 10 | Nearest 100 | Nearest 1000 |
+| 🏛️ Roman numerals | Read I to XX | Read up to C | Pick the right one for a number |
+
+**Negative answers:** type the number, then tap **Make it negative −**.
+Wrong answers show the working with a number line or a place value chart.
 
 ---
 

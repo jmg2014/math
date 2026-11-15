@@ -136,3 +136,19 @@ h3{font-size:1.05rem;margin:1.2em 0 .5em}
 .confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:10}
 .confetti span{position:absolute;top:-50px;animation:fall 2.6s ease-in forwards}
 @keyframes fall{to{transform:translateY(110vh) rotate(540deg)}}
+
+/* number lines and place value charts */
+.nl{width:100%;max-width:640px;margin:0 auto}
+.nl svg{width:100%;height:auto;display:block}
+.nl-axis{stroke:var(--ink);stroke-width:2.5}
+.nl-num{fill:var(--ink);font-size:14px;font-weight:600;text-anchor:middle}
+.nl-num.zero{font-weight:900}
+.nl-lab{fill:var(--ink);font-size:18px;font-weight:800;text-anchor:middle}
+.nl-pt{fill:var(--grey);stroke:var(--ink);stroke-width:2}
+.nl-pt.start{fill:var(--accent)}
+.nl-pt.end{fill:var(--share)}
+.pv{border-collapse:separate;border-spacing:4px;margin:0 auto;font-size:clamp(1.4rem,4vw,2rem);font-weight:800;color:var(--ink)}
+.pv th{font-size:.6em;color:var(--muted);padding:0 .4em}
+.pv td{background:var(--card);border:2px solid var(--line);border-radius:10px;min-width:1.8em;height:1.6em;text-align:center}
+.pv td.on{background:#ffe9a8;border-color:#f2c94c;color:#6a4a00}
+.feedback .nl,.feedback .pv{margin-top:8px}

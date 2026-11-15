@@ -41,6 +41,31 @@ Y4.draw = {
       return `<div>${cells.concat(s.split("")).map(c => `<span>${c}</span>`).join("")}</div>`;
     };
     return `<div class="colsum">${row(A)}${row(B, op)}</div>`;
+  },
+  /* a number line from lo to hi with a tick every `step` (labelled every `labelEvery` ticks).
+     points: [{ v, cls:"start"|"end"|"", label }] are drawn as dots, with an optional label above */
+  numberLine(lo, hi, step, points, labelEvery){
+    const W = 640, pad = 28, y = 52, n = Math.round((hi - lo) / step), le = labelEvery || 1;
+    const x = v => pad + (v - lo) / (hi - lo) * (W - 2 * pad);
+    let h = `<line x1="${pad - 14}" y1="${y}" x2="${W - pad + 14}" y2="${y}" class="nl-axis"/>`;
+    for (let i = 0; i <= n; i++){
+      const v = lo + i * step, big = i % le === 0;
+      h += `<line x1="${x(v)}" y1="${y - (big ? 9 : 5)}" x2="${x(v)}" y2="${y + (big ? 9 : 5)}" class="nl-axis"/>`;
+      if (big) h += `<text x="${x(v)}" y="${y + 30}" class="nl-num ${v === 0 ? "zero" : ""}">${Y4.num(v)}</text>`;
+    }
+    (points || []).forEach(p => {
+      h += `<circle cx="${x(p.v)}" cy="${y}" r="9" class="nl-pt ${p.cls || ""}"/>`;
+      if (p.label) h += `<text x="${x(p.v)}" y="${y - 18}" class="nl-lab">${p.label}</text>`;
+    });
+    return `<div class="nl"><svg viewBox="0 0 ${W} 96" aria-hidden="true">${h}</svg></div>`;
+  },
+  /* a place value chart: Th H T O */
+  placeValue(n, highlight){
+    const d = String(n).padStart(4, " ").split(""), heads = ["Th", "H", "T", "O"];
+    return `<table class="pv"><tr>${heads.map(t => `<th>${t}</th>`).join("")}</tr>
+      <tr>${d.map((c, i) => `<td class="${i === highlight ? "on" : ""}">${c.trim()}</td>`).join("")}</tr></table>`;
   }
 };
+/* numbers written the way children read them: a real minus sign */
+Y4.num = v => v < 0 ? "−" + (-v) : String(v);
 })();

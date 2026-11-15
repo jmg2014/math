@@ -9,6 +9,7 @@
      choices   list of texts, for input "choice"
      check     optional function(given) → true/false, to accept more than one answer
      maxLen    longest number that can be typed (default 3)
+     neg       true to show a "minus" key, for negative answers
      explain   HTML shown when the answer is wrong
      solution  short text for the "to practise" list on the results screen
 */
@@ -184,7 +185,8 @@ function renderAnswer(){
     $("#nextKey").textContent = S.part === "n" ? "Bottom number ⬇" : "⬆ Top number";
   } else {
     el.classList.remove("fracbox");
-    el.textContent = S.answer || " ";
+    el.textContent = (S.answer || S.neg) ? (S.neg ? "−" : "") + S.answer : " ";
+    $("#nextKey").textContent = S.neg ? "Make it positive +" : "Make it negative −";
   }
 }
 function startSession(cfg){
@@ -233,12 +235,12 @@ function nextQuestion(){
   qt.innerHTML = q.text || "";
   qt.classList.toggle("long", !!(q.long || qt.textContent.length > 16));
   $("#qpic").innerHTML = q.picture || "";
-  S.answer = ""; S.fn = ""; S.fd = ""; S.part = "n"; S.choice = undefined;
+  S.answer = ""; S.fn = ""; S.fd = ""; S.part = "n"; S.neg = false; S.choice = undefined;
   const ans = $("#answer");
   ans.style.visibility = "visible";
   ans.style.display = mode === "choice" ? "none" : "";
   $("#pad").style.display = mode === "choice" ? "none" : "";
-  $("#nextKey").style.display = mode === "fraction" ? "" : "none";
+  $("#nextKey").style.display = mode === "fraction" || (mode === "number" && q.neg) ? "" : "none";
   const ch = $("#choices");
   ch.style.display = mode === "choice" ? "" : "none";
   ch.innerHTML = mode === "choice" ? q.choices.map((c,i) => `<button class="choice" data-c="${i}">${c}</button>`).join("") : "";
@@ -270,12 +272,14 @@ function readGiven(q){
     return { n: S.fn === "" ? null : +S.fn, d: S.fd === "" ? null : +S.fd };
   }
   if (m === "choice") return S.choice === undefined ? null : S.choice;
-  return S.answer === "" ? null : parseInt(S.answer, 10);
+  if (S.answer === "") return null;
+  const v = parseInt(S.answer, 10);
+  return S.neg && v !== 0 ? -v : v;
 }
 function givenText(q, g){
   if (g === null) return null;
   if (inputOf(q) === "fraction") return `${g.n === null ? "?" : g.n}/${g.d === null ? "?" : g.d}`;
-  return String(g);
+  return String(g).replace("-", "−");
 }
 function isRight(q, g){
   if (g === null) return false;
@@ -355,7 +359,7 @@ function press(k){
   }
   if (k === "del") S.answer = S.answer.slice(0, -1);
   else if (k === "ok"){ if (S.answer !== "") submit(); return; }
-  else if (k === "next") return;
+  else if (k === "next"){ if (!q.neg) return; S.neg = !S.neg; }
   else if (S.answer.length < (q.maxLen || 3)) S.answer += k;
   renderAnswer();
 }
@@ -389,7 +393,7 @@ document.addEventListener("keydown", e => {
   if (/^[0-9]$/.test(e.key)) press(e.key);
   else if (e.key === "Backspace"){ e.preventDefault(); press("del"); }
   else if (e.key === "Enter"){ e.preventDefault(); press("ok"); }
-  else if (e.key === "/" || e.key === "ArrowDown" || e.key === "ArrowUp"){ e.preventDefault(); press("next"); }
+  else if (e.key === "/" || e.key === "-" || e.key === "ArrowDown" || e.key === "ArrowUp"){ e.preventDefault(); press("next"); }
 });
 $("#quitBtn").addEventListener("click", () => { stopSession(); if (Y4.onQuit) Y4.onQuit(); });
 

@@ -71,7 +71,7 @@ Each skill is one small **generator** that returns a new question each time:
 | Column sum (`input:"column"` with `Y4.draw.column`): digits typed ones first | written methods |
 | Fraction keypad (top / bottom) | sharing problems, equivalent fractions |
 | Decimal keypad (`input:"decimal"`, with a decimal point key; `prefix:"£"` or `suffix:" m"` shown around the answer) | decimals, money, measures |
-| Clock (drag the hands, or type a digital time) | time |
+| Time (`input:"time"`): type 7:45 with a colon key; `any12:true` also accepts 19:45 | time |
 | Multiple choice (2–4 big buttons) | shape names, angle types, comparing |
 | Tap the picture | coordinates, symmetry, chart questions |
 
@@ -129,12 +129,12 @@ first because most other topics depend on them.
 - [x] Round decimals to the nearest whole number; compare decimals
 - [x] Money and measure problems with decimals
 
-### Phase 5 – Measurement
-- [ ] Converting units (km ↔ m, cm ↔ mm, kg ↔ g, l ↔ ml, h ↔ min, years ↔ months)
-- [ ] Perimeter of rectangles and L-shapes (drawn on a grid)
-- [ ] Area by counting squares
-- [ ] Money: adding up prices, working out change
-- [ ] Time: read analogue clocks, and convert between 12-hour and 24-hour time
+### Phase 5 – Measurement ✅
+- [x] Converting units (km ↔ m, cm ↔ mm, kg ↔ g, l ↔ ml, h ↔ min, years ↔ months)
+- [x] Perimeter of rectangles and L-shapes (drawn on a grid)
+- [x] Area by counting squares
+- [x] Money: adding up prices, working out change
+- [x] Time: read analogue clocks, and convert between 12-hour and 24-hour time
 
 ### Phase 6 – Geometry
 - [ ] Name the triangle or quadrilateral (shapes generated at random)

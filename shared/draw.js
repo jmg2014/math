@@ -82,6 +82,75 @@ Y4.draw = {
     }
     return `<div class="hsq"><svg viewBox="0 0 200 200" aria-hidden="true">${h}</svg></div>`;
   },
+  /* an analogue clock showing h:m */
+  clock(h, m){
+    const c = 100, r = 92;
+    let s = `<circle cx="${c}" cy="${c}" r="${r}" class="ck-face"/>`;
+    for (let i = 0; i < 60; i++){
+      const a = i * Math.PI / 30, big = i % 5 === 0, r1 = big ? r - 12 : r - 6;
+      s += `<line x1="${c + r1 * Math.sin(a)}" y1="${c - r1 * Math.cos(a)}" x2="${c + (r - 2) * Math.sin(a)}" y2="${c - (r - 2) * Math.cos(a)}" class="ck-tick ${big ? "big" : ""}"/>`;
+    }
+    for (let n = 1; n <= 12; n++){
+      const a = n * Math.PI / 6;
+      s += `<text x="${c + (r - 27) * Math.sin(a)}" y="${c - (r - 27) * Math.cos(a) + 7}" class="ck-num">${n}</text>`;
+    }
+    const hand = (deg, len, cls) => { const a = deg * Math.PI / 180;
+      return `<line x1="${c}" y1="${c}" x2="${(c + len * Math.sin(a)).toFixed(2)}" y2="${(c - len * Math.cos(a)).toFixed(2)}" class="${cls}"/>`; };
+    s += hand(((h % 12) + m / 60) * 30, 48, "ck-hour") + hand(m * 6, 74, "ck-min") + `<circle cx="${c}" cy="${c}" r="5" class="ck-pin"/>`;
+    return `<div class="clock"><svg viewBox="0 0 200 200" aria-hidden="true">${s}</svg></div>`;
+  },
+  /* a shape on squared paper: cells is a list of [row, col]; the grid is rows × cols */
+  gridShape(cells, rows, cols){
+    const S = 28, W = cols * S + 4, H = rows * S + 4, on = new Set(cells.map(([r, c]) => r + "," + c));
+    let s = "";
+    for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++)
+      s += `<rect x="${2 + c * S}" y="${2 + r * S}" width="${S}" height="${S}" class="${on.has(r + "," + c) ? "gs-on" : "gs-off"}"/>`;
+    // thick outline round the shape: every cell edge with an empty cell (or the edge) on the other side
+    for (const k of on){
+      const [r, c] = k.split(",").map(Number), x = 2 + c * S, y = 2 + r * S;
+      if (!on.has((r - 1) + "," + c)) s += `<line x1="${x}" y1="${y}" x2="${x + S}" y2="${y}" class="gs-edge"/>`;
+      if (!on.has((r + 1) + "," + c)) s += `<line x1="${x}" y1="${y + S}" x2="${x + S}" y2="${y + S}" class="gs-edge"/>`;
+      if (!on.has(r + "," + (c - 1))) s += `<line x1="${x}" y1="${y}" x2="${x}" y2="${y + S}" class="gs-edge"/>`;
+      if (!on.has(r + "," + (c + 1))) s += `<line x1="${x + S}" y1="${y}" x2="${x + S}" y2="${y + S}" class="gs-edge"/>`;
+    }
+    return `<div class="gshape" style="max-width:${Math.min(W * 1.4, 420)}px"><svg viewBox="0 0 ${W} ${H}" aria-hidden="true">${s}</svg></div>`;
+  },
+  /* a shape drawn from corner points (in units), with a label on some sides: labels[i] is for the side from
+     point i to i+1. A label goes outside the shape, or inside if given as [text, "in"]. */
+  labelledShape(points, labels){
+    const xs = points.map(p => p[0]), ys = points.map(p => p[1]);
+    const w = Math.max(...xs) - Math.min(...xs), h = Math.max(...ys) - Math.min(...ys);
+    const k = Math.min(280 / w, 170 / h), pad = 95, W = w * k + 2 * pad, H = h * k + 2 * pad;
+    const P = points.map(([x, y]) => [pad + (x - Math.min(...xs)) * k, pad + (y - Math.min(...ys)) * k]);
+    const inside = (x, y) => {                         // ray casting
+      let c = false;
+      for (let i = 0, j = P.length - 1; i < P.length; j = i++){
+        const [xi, yi] = P[i], [xj, yj] = P[j];
+        if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) c = !c;
+      }
+      return c;
+    };
+    let s = `<polygon points="${P.map(p => p.join(",")).join(" ")}" class="ls-shape"/>`;
+    P.forEach((p, i) => {
+      const lab = labels[i]; if (!lab) return;
+      const [text, where] = Array.isArray(lab) ? lab : [lab, "out"];
+      const q = P[(i + 1) % P.length], mx = (p[0] + q[0]) / 2, my = (p[1] + q[1]) / 2;
+      const horiz = Math.abs(p[1] - q[1]) < 1e-6;
+      let nx = horiz ? 0 : 1, ny = horiz ? 1 : 0;      // a normal to the side
+      if (inside(mx + nx * 3, my + ny * 3) === (where === "out")){ nx = -nx; ny = -ny; }
+      if (horiz && where === "in")                     // inside: line up with the right end, where there's room
+        s += `<text x="${Math.max(p[0], q[0]) - 8}" y="${my + (ny > 0 ? 26 : -10)}" class="ls-lab" style="text-anchor:end">${text}</text>`;
+      else if (horiz) s += `<text x="${mx}" y="${my + (ny > 0 ? 26 : -10)}" class="ls-lab">${text}</text>`;
+      else s += `<text x="${mx + nx * 10}" y="${my + 7}" class="ls-lab" style="text-anchor:${nx > 0 ? "start" : "end"}">${text}</text>`;
+    });
+    return `<div class="lshape"><svg viewBox="0 0 ${W} ${H}" aria-hidden="true">${s}</svg></div>`;
+  },
+  /* coins and notes, values in pence */
+  coins(list){
+    const label = v => v >= 100 ? `£${v / 100}` : `${v}p`;
+    const kind = v => v >= 500 ? "note" : v >= 100 ? "gold" : v >= 5 ? "silver" : "copper";
+    return `<div class="coins">${list.map(v => `<span class="coin ${kind(v)}">${label(v)}</span>`).join("")}</div>`;
+  },
   /* a place value chart with decimals (T O . t h), one row per number, e.g. to show ÷ 10 */
   decimalChart(rows){
     const cols = ["T", "O", "t", "h"];

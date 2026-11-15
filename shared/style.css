@@ -169,3 +169,31 @@ h3{font-size:1.05rem;margin:1.2em 0 .5em}
 .pv.dec td.dot{background:none;border:none;min-width:.4em}
 .pv.dec th.rl{font-size:.55em;text-align:left;padding-left:.6em;white-space:nowrap}
 .choice .frac{font-size:.95em}
+
+/* measurement pictures */
+.clock{width:clamp(160px,32vw,230px);margin:0 auto}
+.clock svg{width:100%;height:auto;display:block}
+.ck-face{fill:var(--card);stroke:var(--ink);stroke-width:4}
+.ck-tick{stroke:var(--muted);stroke-width:1.5}
+.ck-tick.big{stroke:var(--ink);stroke-width:3}
+.ck-num{fill:var(--ink);font-size:19px;font-weight:700;text-anchor:middle}
+.ck-hour{stroke:var(--ink);stroke-width:8;stroke-linecap:round}
+.ck-min{stroke:var(--accent);stroke-width:5;stroke-linecap:round}
+.ck-pin{fill:var(--ink)}
+.gshape{width:100%;margin:0 auto}
+.gshape svg{width:100%;height:auto;display:block}
+.gs-off{fill:var(--card);stroke:var(--line);stroke-width:1}
+.gs-on{fill:var(--cake);stroke:var(--cake-edge);stroke-width:1}
+.gs-edge{stroke:var(--ink);stroke-width:3;stroke-linecap:round}
+.lshape{width:100%;max-width:420px;margin:0 auto}
+.lshape svg{width:100%;height:auto;display:block}
+.ls-shape{fill:var(--cake);stroke:var(--ink);stroke-width:3}
+.ls-lab{fill:var(--ink);font-size:20px;font-weight:800;text-anchor:middle}
+.coins{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:460px;margin:0 auto}
+.coin{display:inline-flex;align-items:center;justify-content:center;width:62px;height:62px;border-radius:50%;font-weight:800;font-size:1.05rem;border:3px solid}
+.coin.copper{background:#e2a170;border-color:#9a5a2c;color:#3d1e08}
+.coin.silver{background:#dfe3ea;border-color:#8b93a1;color:#22262d}
+.coin.gold{background:#f3d36b;border-color:#a98318;color:#3d2e00}
+.coin.note{border-radius:8px;width:92px;background:#a7d8b9;border-color:#3f8a5c;color:#123d22}
+.pv.menu th{text-align:left;font-size:.6em;color:var(--ink);padding-right:.8em}
+.pv.menu td{padding:0 .4em;font-size:.8em}

@@ -6,7 +6,8 @@
      picture   optional HTML/SVG shown above it
      input     "number" (default) | "fraction" | "choice" |
                "column" (a number typed into a column sum from Y4.draw.column, ones first) |
-               "decimal" (a number with a decimal point key; 3.2 and 3.20 both count)
+               "decimal" (a number with a decimal point key; 3.2 and 3.20 both count) |
+               "time" (a time like 7:45 with a colon key; answer is {h, m}; any12:true also accepts 19:45)
      answer    number, {n, d} for fractions, or the right choice text
      choices   list of texts, for input "choice"
      check     optional function(given) → true/false, to accept more than one answer
@@ -199,7 +200,7 @@ function renderAnswer(){
     el.classList.remove("fracbox");
     const typed = (S.neg ? "−" : "") + S.answer, pre = q.prefix || "", suf = q.suffix || "";
     el.textContent = typed || pre || suf ? pre + typed + suf : " ";
-    $("#nextKey").textContent = inputOf(q) === "decimal" ? "Decimal point ." : S.neg ? "Make it positive +" : "Make it negative −";
+    $("#nextKey").textContent = inputOf(q) === "decimal" ? "Decimal point ." : inputOf(q) === "time" ? "Colon :" : S.neg ? "Make it positive +" : "Make it negative −";
   }
 }
 function startSession(cfg){
@@ -246,14 +247,14 @@ function nextQuestion(){
   updateProgress();
   const mode = inputOf(q), qt = $("#qtext");
   qt.innerHTML = q.text || "";
-  qt.classList.toggle("long", !!(q.long || qt.textContent.length > 16));
+  qt.classList.toggle("long", !!(q.long || qt.textContent.length > 16 || /[a-z]{3}/.test(qt.textContent)));   // words, not a sum
   $("#qpic").innerHTML = q.picture || "";
   S.answer = ""; S.fn = ""; S.fd = ""; S.part = "n"; S.neg = false; S.choice = undefined;
   const ans = $("#answer");
   ans.style.visibility = "visible";
   ans.style.display = mode === "choice" || mode === "column" ? "none" : "";
   $("#pad").style.display = mode === "choice" ? "none" : "";
-  $("#nextKey").style.display = mode === "fraction" || mode === "decimal" || (mode === "number" && q.neg) ? "" : "none";
+  $("#nextKey").style.display = mode === "fraction" || mode === "decimal" || mode === "time" || (mode === "number" && q.neg) ? "" : "none";
   const ch = $("#choices");
   ch.style.display = mode === "choice" ? "" : "none";
   ch.innerHTML = mode === "choice" ? q.choices.map((c,i) => `<button class="choice" data-c="${i}">${c}</button>`).join("") : "";
@@ -285,12 +286,25 @@ function readGiven(q){
     return { n: S.fn === "" ? null : +S.fn, d: S.fd === "" ? null : +S.fd };
   }
   if (m === "choice") return S.choice === undefined ? null : S.choice;
+  if (m === "time") return readTime(S.answer);
   if (S.answer === "" || S.answer === "0.") return null;
   const v = m === "decimal" ? parseFloat(S.answer) : parseInt(S.answer, 10);
   return S.neg && v !== 0 ? -v : v;
 }
+/* "7:45", "745" or "1530" → {h, m}; a bad time (like 7:75) → {bad:true} */
+function readTime(t){
+  if (t === "" || t === ":") return null;
+  let h, m;
+  if (t.includes(":")){ const [a, b] = t.split(":"); h = +a; m = b === "" ? 0 : +b; if (b.length === 1) m = +b; }
+  else if (t.length <= 2){ h = +t; m = 0; }
+  else { h = +t.slice(0, -2); m = +t.slice(-2); }
+  if (!(m >= 0 && m < 60 && h >= 0 && h < 24)) return { bad:true, text:t };
+  return { h, m };
+}
+Y4.timeText = (h, m) => `${h}:${String(m).padStart(2, "0")}`;
 function givenText(q, g){
   if (g === null) return null;
+  if (inputOf(q) === "time") return g.bad ? g.text : Y4.timeText(g.h, g.m);
   if (inputOf(q) === "fraction") return `${g.n === null ? "?" : g.n}/${g.d === null ? "?" : g.d}`;
   const shown = q.prefix === "£" ? g.toFixed(2) : String(g).replace("-", "−");
   return (q.prefix || "") + shown + (q.suffix || "");
@@ -301,6 +315,7 @@ function isRight(q, g){
   if (inputOf(q) === "fraction")   // any equal fraction counts (2/4 = 1/2)
     return g.n !== null && !!g.d && g.n * q.answer.d === g.d * q.answer.n;
   if (inputOf(q) === "decimal") return Math.abs(g - q.answer) < 1e-6;
+  if (inputOf(q) === "time") return !g.bad && g.m === q.answer.m && (q.any12 ? g.h % 12 === q.answer.h % 12 : g.h === q.answer.h);
   return g === q.answer;
 }
 function submit(){
@@ -379,8 +394,13 @@ function press(k){
   else if (k === "ok"){ if (S.answer !== "") submit(); return; }
   else if (k === "next"){
     if (m === "decimal"){ if (!S.answer.includes(".")) S.answer += S.answer === "" ? "0." : "."; }
+    else if (m === "time"){ if (!S.answer.includes(":") && S.answer !== "") S.answer += ":"; }
     else if (q.neg) S.neg = !S.neg;
     else return;
+  }
+  else if (m === "time"){                          // at most 2 digits after the colon
+    const after = S.answer.includes(":") ? S.answer.split(":")[1] : null;
+    if (after !== null ? after.length < 2 : S.answer.length < 4) S.answer += k;
   }
   else if (S.answer.length < (q.maxLen || (m === "decimal" ? 6 : 3))) S.answer = col ? k + S.answer : S.answer + k;
   renderAnswer();
@@ -415,7 +435,7 @@ document.addEventListener("keydown", e => {
   if (/^[0-9]$/.test(e.key)) press(e.key);
   else if (e.key === "Backspace"){ e.preventDefault(); press("del"); }
   else if (e.key === "Enter"){ e.preventDefault(); press("ok"); }
-  else if (e.key === "/" || e.key === "-" || e.key === "." || e.key === "," || e.key === "ArrowDown" || e.key === "ArrowUp"){ e.preventDefault(); press("next"); }
+  else if (e.key === "/" || e.key === "-" || e.key === "." || e.key === "," || e.key === ":" || e.key === "ArrowDown" || e.key === "ArrowUp"){ e.preventDefault(); press("next"); }
 });
 $("#quitBtn").addEventListener("click", () => { stopSession(); if (Y4.onQuit) Y4.onQuit(); });
 

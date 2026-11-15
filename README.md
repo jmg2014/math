@@ -12,7 +12,8 @@ See [ROADMAP.md](ROADMAP.md) for what is built and what comes next.
 | 🔢 Number & Place Value | `number/` | ✅ Built |
 | ➕ Addition & Subtraction | `add-subtract/` | ✅ Built |
 | 🍕 Fractions & Decimals | `fractions/` | ✅ Built |
-| 📏 Measurement, 🔷 Shapes, 📊 Statistics | – | 🚧 Coming soon |
+| 📏 Measurement | `measurement/` | ✅ Built |
+| 🔷 Shapes, 📊 Statistics | – | 🚧 Coming soon |
 
 ---
 
@@ -165,6 +166,19 @@ A wrong column sum shows the working column by column, with every carry and exch
 
 **Decimal answers:** tap **Decimal point .** to type the point. 3.2 and 3.20 both count.
 Money answers show **£** in the answer box, so only the number is typed.
+
+## 📏 Measurement
+
+| Skill | Level 1 | Level 2 | Level 3 |
+|---|---|---|---|
+| 📏 Converting units | 3 m = □ cm · 4000 g = □ kg | 2 m 35 cm = □ cm · 2 hours 15 minutes = □ minutes | 1.5 km = □ m · 350 cm = □ m · which is longer? |
+| 📐 Perimeter | Rectangles on squared paper | L, T and step shapes on squared paper | Labelled rectangles and L shapes · find a missing side |
+| ⬛ Area | Rectangles on squared paper | L, T and step shapes on squared paper | Labelled rectangles and L shapes |
+| 🕒 Telling the time | Read a clock (to 5 minutes) | To the minute · 3:45 pm = 15:45 · 18:20 = 6:20 pm | When does it end? · minutes between · 25 minutes later |
+| 💰 Money | Count coins and notes | Add up prices from a price list | 4 tickets at £3.25 · how many pens for £2? · share equally |
+
+**Time answers:** type the hours, tap **Colon :**, then type the minutes (or just type 745 for 7:45).
+When reading a clock, both 7:45 and 19:45 count.
 
 ---
 

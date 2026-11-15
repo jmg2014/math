@@ -196,7 +196,10 @@ function buildMix(){
 Y4._buildMix = buildMix;                               // for testing
 function startMix(){
   Y4.startSession({ title:"🌞 Today's mix", questions:buildMix(), feedback:true, requeue:true, maxQ:15, waitOnWrong:true, okDelay:900,
-    onAnswer:(q, ok, ms) => q._fact ? P.recordFact(q._fact[0], q._fact[1], ok, ms) : P.record(q._skill, ok, ms),
+    onAnswer:(q, ok, ms) => {
+      if (q._fact) P.recordFact(q._fact[0], q._fact[1], ok, ms); else P.record(q._skill, ok, ms);
+      if (q.div) P.recordDivFact(q.div[0], q.div[1], ok, ms);   // division facts also go on the ÷ grid
+    },
     onFinish:finishMix });
 }
 function finishMix(res){
@@ -248,8 +251,10 @@ function renderParents(){
   const weak = allSkills().map(({ s, T }) => ({ s, T, r:P.peek(s.id) })).filter(x => x.r && x.r.seen >= 5 && !x.r.star)
     .sort((a, b) => a.r.correct / a.r.seen - b.r.correct / b.r.seen).slice(0, 5);
   // trickiest times tables facts
-  const t = P.timesTables(), facts = t && t.facts ? Object.entries(t.facts).filter(([, f]) => f.seen && f.streak < 3)
-    .sort((a, b) => (a[1].correct / a[1].seen) - (b[1].correct / b[1].seen)).slice(0, 6) : [];
+  const t = P.timesTables();
+  const facts = [...Object.entries((t && t.facts) || {}).map(([k, f]) => [k.replace("x", " × "), f]),
+                 ...Object.entries((t && t.dfacts) || {}).map(([k, f]) => [k.replace("/", " ÷ "), f])]
+    .filter(([, f]) => f.seen && f.streak < 3).sort((a, b) => (a[1].correct / a[1].seen) - (b[1].correct / b[1].seen)).slice(0, 8);
 
   $("#parentBody").innerHTML = `
     <div class="records" style="margin-top:12px">
@@ -267,9 +272,9 @@ function renderParents(){
     ${weak.length ? `<div class="weak">${weak.map(({ s, T, r }) => `<a href="${T.id}/#${s.id}"><span>${T.emoji} ${s.name}<br><small>${T.title} · level ${r.level} of 3</small></span>
       <span style="text-align:right"><b>${Math.round(r.correct / r.seen * 100)}%</b><br><small>of ${r.seen} right</small></span></a>`).join("")}</div>`
       : `<p class="muted">Not enough answers yet. This fills in after a few sessions.</p>`}
-    <h3>Trickiest times tables facts</h3>
-    ${facts.length ? `<div class="chips" style="justify-content:flex-start">${facts.map(([k, f]) => `<span class="chip"><b>${k.replace("x", " × ")}</b><small>${f.correct} of ${f.seen} right</small></span>`).join("")}</div>`
-      : `<p class="muted">None yet. Play Tricky Facts or the Mock Check to fill this in.</p>`}
+    <h3>Trickiest times tables and division facts</h3>
+    ${facts.length ? `<div class="chips" style="justify-content:flex-start">${facts.map(([k, f]) => `<span class="chip"><b>${k}</b><small>${f.correct} of ${f.seen} right</small></span>`).join("")}</div>`
+      : `<p class="muted">None yet. Play Tricky Facts, the Mock Check or Division facts to fill this in.</p>`}
     <p class="muted" style="margin-top:14px">Time answering counts the time spent on each question (up to a minute each), so it is a little less than time in the app.</p>`;
   // tooltip on the weekly bars (hover, or tap on the tablet)
   const box = $("#parentBody .wk"), tipEl = box.querySelector(".wk-tip");

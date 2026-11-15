@@ -20,6 +20,8 @@
 .cell.struggling{background:#f7c3c3;color:#7a1d1d}
 .cell.learning{background:#fbe1a0;color:#6a4a00}
 .cell.mastered{background:#a6e5c1;color:#0d5a33}
+.gridtabs{display:flex;gap:8px;margin-top:6px}
+.gridtabs .tab{padding:8px 16px}
 .legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:10px;font-size:.9rem;color:var(--muted)}
 .legend i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:4px}
 .bars{display:flex;align-items:flex-end;gap:8px;height:120px;margin-top:8px}
@@ -104,6 +106,8 @@ body.exam{background:#fff;color:#0b0c0c}
   <div class="panel">
     <h2>My progress</h2>
     <div id="summary"></div>
+    <div class="gridtabs"><button class="tab on" data-grid="x">× Multiplication</button><button class="tab" data-grid="d">÷ Division</button></div>
+    <p id="gridNote" class="muted"></p>
     <div id="grid"></div>
     <div class="legend">
       <span><i style="background:var(--grey)"></i>Not tried yet</span>
@@ -192,6 +196,14 @@ function status(a,b){
   if (f.last === 0) return "struggling";
   return "learning";
 }
+function divStatus(p, d){                 // a division fact from Multiplication & Division (or the daily mix)
+  const f = (data.dfacts || {})[p + "/" + d];
+  if (!f || !f.seen) return "new";
+  if (f.streak >= 3) return "mastered";
+  if (f.last === 0) return "struggling";
+  return "learning";
+}
+let gridKind = "x";                       // which grid is showing: × or ÷
 function tableInfo(t){ return data.tables[t] || (data.tables[t] = { level:1, star:false }); }
 
 /* ---------- helpers ---------- */
@@ -210,13 +222,31 @@ function renderHome(){
   for (let t = 2; t <= 12; t++){ const s = tableInfo(t).star; stars += `<span class="starchip ${s ? "on" : ""}">${s ? "⭐" : "☆"} ${t}</span>`; }
   const pairs = allPairs();
   const mastered = pairs.filter(([a,b]) => status(a,b) === "mastered").length;
+  let dMastered = 0;
+  for (let d = 2; d <= 12; d++) for (let q = 2; q <= 12; q++) if (divStatus(d * q, d) === "mastered") dMastered++;
   $("#summary").innerHTML = `<div class="stars">${stars}</div>
-    <p class="muted"><b>${mastered}</b> of ${pairs.length} facts mastered (right 3 times in a row, each within 6 seconds).</p>`;
-  let g = `<div class="cell head">×</div>`;
-  for (let c = 2; c <= 12; c++) g += `<div class="cell head">${c}</div>`;
-  for (let r = 2; r <= 12; r++){
-    g += `<div class="cell head">${r}</div>`;
-    for (let c = 2; c <= 12; c++) g += `<div class="cell ${status(r,c)}">${r*c}</div>`;
+    <p class="muted"><b>${mastered}</b> of ${pairs.length} × facts mastered (right 3 times in a row, each within 6 seconds).<br>
+    <b>${dMastered}</b> of 121 ÷ facts mastered (right 3 times in a row).</p>`;
+  document.querySelectorAll("[data-grid]").forEach(b => b.classList.toggle("on", b.dataset.grid === gridKind));
+  let g;
+  if (gridKind === "x"){
+    $("#gridNote").textContent = "Each square is one fact: row × column. 7 × 8 and 8 × 7 count as the same fact.";
+    g = `<div class="cell head">×</div>`;
+    for (let c = 2; c <= 12; c++) g += `<div class="cell head">${c}</div>`;
+    for (let r = 2; r <= 12; r++){
+      g += `<div class="cell head">${r}</div>`;
+      for (let c = 2; c <= 12; c++) g += `<div class="cell ${status(r,c)}">${r*c}</div>`;
+    }
+  } else {
+    // row = the number you divide by, column = the answer; the square shows the number being divided
+    $("#gridNote").innerHTML = `Each square is one fact: <b>square ÷ row = column</b>. For example, the 56 in row 7 means 56 ÷ 7 = 8.
+      Practise these in <a href="../multiply-divide/#md-div">Multiplication &amp; Division → Division facts</a>.`;
+    g = `<div class="cell head">÷</div>`;
+    for (let c = 2; c <= 12; c++) g += `<div class="cell head">${c}</div>`;
+    for (let d = 2; d <= 12; d++){
+      g += `<div class="cell head">${d}</div>`;
+      for (let q = 2; q <= 12; q++) g += `<div class="cell ${divStatus(d * q, d)}" title="${d * q} ÷ ${d} = ${q}">${d * q}</div>`;
+    }
   }
   $("#grid").innerHTML = g;
   $("#records").innerHTML =
@@ -437,6 +467,7 @@ $("#tableGrid").addEventListener("click", e => { const b = e.target.closest("[da
 $("#levelList").addEventListener("click", e => { const b = e.target.closest("[data-l]"); if (b && !b.disabled) startLearn(curTable, +b.dataset.l); });
 $("#backTables").addEventListener("click", renderTables);
 $("#soundBtn").addEventListener("click", () => { Y4.prog.sound = !Y4.prog.sound; renderHome(); });
+document.querySelectorAll("[data-grid]").forEach(b => b.addEventListener("click", () => { gridKind = b.dataset.grid; renderHome(); }));
 $("#resetBtn").addEventListener("click", () => {
   if (confirm("Reset ALL times tables progress (stars, scores, facts)? This cannot be undone.")){ data = blank(); save(); renderHome(); }
 });

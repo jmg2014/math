@@ -55,6 +55,16 @@ const P = Y4.prog = {
     write(TT, t);
     P.logDay(ok, ms);
   },
+  /* a division fact, e.g. 56 ÷ 7, for the ÷ grid on the Times Tables page: { "56/7": {seen, correct, streak, last} }.
+     Not timed like the check, so up to 10 seconds still counts towards "mastered". (The answer is logged by record().) */
+  recordDivFact(dividend, divisor, ok, ms){
+    const t = read(TT) || { facts:{}, tables:{}, mock:{ best:null, history:[] }, clock:{ best:0, history:[] }, streak:{ best:0 } };
+    const d = t.dfacts || (t.dfacts = {}), k = dividend + "/" + divisor;
+    const f = d[k] || (d[k] = { seen:0, correct:0, streak:0, last:null });
+    f.seen++; f.last = ok ? 1 : 0;
+    if (ok){ f.correct++; if (ms <= 10000) f.streak++; } else f.streak = 0;
+    write(TT, t);
+  },
   /* the daily mix streak: days in a row with a finished daily mix */
   get daily(){ return data.daily; },
   dailyDone(){

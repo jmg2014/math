@@ -166,7 +166,7 @@ Checked every statutory Year 4 statement on GOV.UK; `year4_maths_curriculum.md` 
 - [x] Presenting data: drawing bar charts and plotting time graphs (Make a chart skill, `input:"bars"`)
 
 ### Ideas for later
-- [ ] Division facts in the Times Tables progress grid
+- [x] Division facts in the Times Tables progress grid (a ÷ grid next to the × grid)
 - [ ] A printable progress report for school
 
 ---

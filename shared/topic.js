@@ -78,7 +78,7 @@ function start(skill, lv){
   }
   Y4.startSession({ title:`${skill.name} · Level ${lv}`, questions, feedback:true,
     requeue:true, maxQ:ROUND + 4, waitOnWrong:true, okDelay:900,
-    onAnswer:(q, ok, ms) => P.record(skill.id, ok, ms),
+    onAnswer:(q, ok, ms) => { P.record(skill.id, ok, ms); if (q.div) P.recordDivFact(q.div[0], q.div[1], ok, ms); },
     onFinish:res => finish(skill, lv, res) });
 }
 

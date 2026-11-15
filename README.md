@@ -276,11 +276,14 @@ How long can your streak be?
 
 ### The Times Tables home screen
 - **Stars:** one ⭐ for each table mastered in *Learn a Table*.
-- **Progress grid:** every fact from 2×2 to 12×12, coloured by how well it's known:
+- **Progress grid:** tap **× Multiplication** or **÷ Division** to switch grids.
+  The × grid has every fact from 2×2 to 12×12. The ÷ grid has every division fact (the square ÷ the row = the column,
+  so 56 in row 7 means 56 ÷ 7 = 8); it fills in from *Multiplication & Division → Division facts* and the daily mix.
+  Squares are coloured by how well each fact is known:
   - grey: not tried yet
   - red: needs practice
   - yellow: learning
-  - green: **mastered** (right 3 times in a row, each within 6 seconds)
+  - green: **mastered** (right 3 times in a row; within 6 seconds each for ×, within 10 seconds for ÷)
 - **My records:** the best mock check score, the Beat the Clock record and the longest streak.
 - **Mock check scores:** a chart of recent mock checks.
 - **Reset times tables progress:** clears the times tables only.

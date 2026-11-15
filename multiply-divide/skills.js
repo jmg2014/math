@@ -5,7 +5,7 @@ const { rnd, pick, shuffle, frac } = Y4;
 
 /* ---------- Division facts ---------- */
 function divFact(t, m){
-  return { text:`${t * m} ÷ ${t} =`, answer:m, key:`${t * m}/${t}`,
+  return { text:`${t * m} ÷ ${t} =`, answer:m, key:`${t * m}/${t}`, div:[t * m, t],   // div: recorded on the ÷ grid
     explain:`${t * m} ÷ ${t} = <b>${m}</b><span class="why">because ${m} × ${t} = ${t * m}</span>`,
     solution:`${t * m} ÷ ${t} = ${m}` };
 }
@@ -22,11 +22,11 @@ const divFacts = {
     const t = rnd(2,12), m = rnd(2,12), p = t * m;
     if (lv === 2) return divFact(t, m);
     const form = rnd(1,3);
-    if (form === 1) return { text:`□ ÷ ${t} = ${m}`, answer:p, key:`?/${t}=${m}`,
+    if (form === 1) return { text:`□ ÷ ${t} = ${m}`, answer:p, key:`?/${t}=${m}`, div:[p, t],
       explain:`<b>${p}</b> ÷ ${t} = ${m}<span class="why">The missing number is ${m} × ${t} = ${p}</span>`, solution:`${p} ÷ ${t} = ${m}` };
-    if (form === 2) return { text:`${p} ÷ □ = ${m}`, answer:t, key:`${p}/?=${m}`,
+    if (form === 2) return { text:`${p} ÷ □ = ${m}`, answer:t, key:`${p}/?=${m}`, div:[p, t],
       explain:`${p} ÷ <b>${t}</b> = ${m}<span class="why">because ${m} × ${t} = ${p}</span>`, solution:`${p} ÷ ${t} = ${m}` };
-    return { text:`${t} × □ = ${p}`, answer:m, key:`${t}x?=${p}`,
+    return { text:`${t} × □ = ${p}`, answer:m, key:`${t}x?=${p}`, div:[p, t],
       explain:`${t} × <b>${m}</b> = ${p}<span class="why">Work out ${p} ÷ ${t} = ${m}</span>`, solution:`${t} × ${m} = ${p}` };
   }
 };

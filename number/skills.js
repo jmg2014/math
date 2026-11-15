@@ -298,6 +298,12 @@ function wrongRomans(n){
   [n + 1, n - 1, n + 10, n - 10, n + 5, n - 5].forEach(m => { if (m >= 1 && m <= 100) add(roman(m)); });
   return shuffle([...w]).slice(0, 3);
 }
+const ROMAN_FACTS = [
+  ["Did the Romans have a numeral for zero?", "No", "There is no Roman numeral for zero. Our numbers came later, from India and the Arab world, and they include 0."],
+  ["In Roman numerals, does X always mean ten, wherever it is written?", "Yes", "X always means 10. In our numbers a digit's place changes its value (the 3 in 30 and 300), but Roman numerals don't use place value."],
+  ["In our numbers, does the digit 3 mean the same in 30 and in 300?", "No", "In 30 it means 3 tens, in 300 it means 3 hundreds. That's place value, and the 0 holds the empty places."],
+  ["Can you write 105 in Roman numerals without using a zero?", "Yes", "105 is CV: C is 100 and V is 5, with nothing for 'no tens'. Our numbers need a 0 to hold the tens place: 105."]
+];
 const romanSkill = {
   id:"nu-roman", name:"Roman numerals", emoji:"🏛️",
   desc:KEY_ROMAN,
@@ -312,6 +318,11 @@ const romanSkill = {
       return { text:`${roman(n)} =`, answer:n, key:roman(n),
         explain:`<b>${n}</b><span class="why">${romanWhy(n)}</span>`, solution:`${roman(n)} = ${n}` };
     }
+    if (Math.random() < .2){                         // how numbers changed over time
+      const [text, answer, why] = pick(ROMAN_FACTS);
+      return { text, input:"choice", choices:["Yes", "No"], answer, key:text,
+        explain:`<b>${answer}</b><span class="why">${why}</span>`, solution:`${text} ${answer}` };
+    }
     const n = Math.random() < .5 ? pick([4, 9, 14, 19, 24, 29, 34, 39, 40, 44, 49, 59, 69, 90, 94, 99]) : rnd(11, 100);
     const r = roman(n);
     return { text:`Which is ${n} in Roman numerals?`, input:"choice", choices:shuffle([r, ...wrongRomans(n)]), answer:r, key:`w${n}`,
@@ -319,6 +330,89 @@ const romanSkill = {
   }
 };
 
+/* ---------- Number lines: read, estimate and place numbers ---------- */
+const LINES = [[0, 100, 10], [0, 1000, 100], [0, 10000, 1000], [2000, 3000, 100], [4000, 5000, 100], [500, 1500, 100]];
+const numberLines = {
+  id:"nu-line", name:"Number lines", emoji:"📍",
+  desc:"Use the numbers you can see to work out what each small mark is worth. To estimate, think: is it near the start, the middle or the end?",
+  levels:[
+    { name:"Read the arrow", desc:"0 to 100 and 0 to 1000, on a mark or halfway" },
+    { name:"Estimate", desc:"About what number is the arrow pointing to?" },
+    { name:"Put it on the line", desc:"Tap where 6500 goes · lines that don't start at 0" }
+  ],
+  make(lv){
+    if (lv === 1){
+      const [lo, hi, step] = pick(LINES.slice(0, 2)), half = Math.random() < .35;
+      const v = lo + step * rnd(1, 9) + (half ? step / 2 : 0);
+      return { text:"What number is the arrow pointing to?", picture:Y4.draw.numberLine(lo, hi, step, [{ v, arrow:true }], 5), answer:v, maxLen:4, key:`r${hi}/${v}`,
+        explain:`<b>${v}</b><span class="why">Each mark is worth ${step}${half ? `, and the arrow is halfway between two marks (half of ${step} is ${step / 2})` : ""}.</span>`,
+        solution:`The arrow points to ${v}` };
+    }
+    if (lv === 2){
+      const [lo, hi, step] = pick(LINES.slice(0, 3)), range = hi - lo;
+      const v = lo + Math.round(rf01() * range * .9 / (range / 100) + 5) * (range / 100);
+      const tol = range / 20;                         // within 5% of the length of the line counts
+      return { text:"Estimate: about what number is the arrow pointing to?", picture:Y4.draw.numberLine(lo, hi, step, [{ v, arrow:true }], 5), answer:v, maxLen:5,
+        check:g => Math.abs(g - v) <= tol, key:`e${hi}/${v}`,
+        explain:`It's about <b>${v}</b><span class="why">Anything from ${v - tol} to ${v + tol} is a good estimate. Find the mark just before the arrow, then think how far it is to the next one.</span>`,
+        solution:`About ${v} (${v - tol} to ${v + tol} is fine)` };
+    }
+    const [lo, hi, step] = pick(LINES.slice(1)), range = hi - lo, tapStep = range / 50;
+    let v; do { v = lo + tapStep * rnd(3, 47); } while (v % step === 0 && Math.random() < .7);
+    const tol = range / 20;
+    return { text:`Tap where ${v} goes on the number line.`, picture:Y4.draw.numberLine(lo, hi, step, [], 5, tapStep), input:"tap", answer:String(v),
+      check:g => Math.abs(+g - v) <= tol, tapText:g => `about ${g}`, key:`t${lo}/${hi}/${v}`,
+      explain:`${v} is shown in green<span class="why">The line goes from ${lo} to ${hi}, and each mark is ${step}. Anywhere close to ${v} counts.</span>`,
+      solution:`${v} on a line from ${lo} to ${hi}` };
+  }
+};
+function rf01(){ return Math.random(); }
+
+/* ---------- Number problems: all of the above, in real life ---------- */
+const MOUNTAINS = [["Ben Nevis", 1345], ["Snowdon", 1085], ["Scafell Pike", 978], ["Helvellyn", 950], ["Slieve Donard", 850], ["Ben Macdui", 1309]];
+function digitsCard(){ let d; do { d = shuffle([0,1,2,3,4,5,6,7,8,9]).slice(0, 4); } while (d.every(x => x !== 0) && Math.random() < .4); return d; }
+const problems = {
+  id:"nu-problems", name:"Number problems", emoji:"🧠",
+  desc:"Real-life problems using place value, ordering, rounding and 1000 more or less. Read carefully and decide what the question is really asking.",
+  levels:[
+    { name:"More, less and order", desc:"A school had 2345 books and bought 1000 more…" },
+    { name:"Rounding and digit cards", desc:"A crowd of 4672, to the nearest 100 · the biggest number from 3, 8, 1, 6" },
+    { name:"Puzzles", desc:"A number rounds to 350: what's the smallest it could be?" }
+  ],
+  make(lv){
+    if (lv === 1){
+      if (Math.random() < .5){
+        const n = rnd(1200, 8800), more = Math.random() < .5, what = pick(["books in the library", "stickers in the album", "people at the fair", "steps on a walk"]);
+        const r = more ? n + 1000 : n - 1000;
+        return { text:`There were ${n} ${what}. ${more ? "Then there were 1000 more" : "Then there were 1000 fewer"}. How many are there now?`, answer:r, maxLen:5, key:`ml${n}${more}`,
+          explain:`<b>${r}</b><span class="why">${n} ${more ? "+" : "−"} 1000 = ${r}. Only the thousands digit changes.</span>`, solution:`${n} ${more ? "+" : "−"} 1000 = ${r}` };
+      }
+      const [a, b] = shuffle(MOUNTAINS.slice()).slice(0, 2), tall = Math.random() < .5, ans = (tall ? a[1] > b[1] : a[1] < b[1]) ? a[0] : b[0];
+      return { text:`${a[0]} is ${a[1]} m high. ${b[0]} is ${b[1]} m high. Which mountain is ${tall ? "higher" : "lower"}?`, input:"choice", choices:[a[0], b[0]], answer:ans, key:`mt${a[0]}${b[0]}${tall}`,
+        explain:`<b>${ans}</b><span class="why">Compare ${a[1]} and ${b[1]}: look at the thousands first, then the hundreds.</span>`, solution:`${a[0]} ${a[1]} m, ${b[0]} ${b[1]} m: ${ans} is ${tall ? "higher" : "lower"}` };
+    }
+    if (lv === 2){
+      if (Math.random() < .5){
+        const n = rnd(1050, 9950), to = pick([10, 100, 1000]), r = Math.round(n / to) * to, what = pick(["people watched the match", "runners took part in the race", "visitors came to the museum"]);
+        return { text:`${n} ${what}. The newspaper rounds it to the nearest ${to}. What number does it print?`, answer:r, maxLen:5, key:`np${n}/${to}`,
+          explain:`<b>${r}</b><span class="why">${n} is between ${Math.floor(n / to) * to} and ${Math.floor(n / to) * to + to}, and it is nearer to ${r}.</span>`, solution:`${n} → ${r}` };
+      }
+      const d = digitsCard(), big = Math.random() < .5;
+      const sorted = d.slice().sort((x, y) => big ? y - x : x - y);
+      if (!big && sorted[0] === 0){ const i = sorted.findIndex(x => x > 0); [sorted[0], sorted[i]] = [sorted[i], sorted[0]]; }
+      const ans = +sorted.join("");
+      return { text:`Use the digit cards ${d.join(", ")} once each. What is the ${big ? "biggest" : "smallest"} 4-digit number you can make?`, answer:ans, maxLen:4, key:`dc${d.join("")}${big}`,
+        explain:`<b>${ans}</b><span class="why">Put the ${big ? "biggest" : "smallest"} digit in the thousands place, then the next ${big ? "biggest" : "smallest"}, and so on.${!big && d.includes(0) ? " A 4-digit number can't start with 0, so 0 goes second." : ""}</span>`,
+        solution:`${d.join(", ")} → ${ans}` };
+    }
+    const to = pick([10, 100]), m = to === 10 ? rnd(12, 99) * 10 : rnd(12, 99) * 100, small = Math.random() < .5;
+    const ans = small ? m - to / 2 : m + to / 2 - 1;
+    return { text:`A whole number rounded to the nearest ${to} is ${m}. What is the ${small ? "smallest" : "largest"} it could be?`, answer:ans, maxLen:5, key:`pz${m}/${to}${small}`,
+      explain:`<b>${ans}</b><span class="why">Numbers from ${m - to / 2} to ${m + to / 2 - 1} round to ${m}. ${m + to / 2} would round up to ${m + to}.</span>`,
+      solution:`${m - to / 2} to ${m + to / 2 - 1} round to ${m}` };
+  }
+};
+
 Y4.TOPICS.push({ id:"number", title:"Number & Place Value", emoji:"🔢",
-  skills:[counting, moreLessSkill, negative, place, compare, rounding, romanSkill] });
+  skills:[counting, moreLessSkill, negative, place, compare, rounding, numberLines, problems, romanSkill] });
 })();

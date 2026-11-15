@@ -261,3 +261,26 @@ h3{font-size:1.05rem;margin:1.2em 0 .5em}
 .dtable tr:first-child th{background:var(--key);color:var(--ink)}
 .dtable th{text-align:left;color:var(--ink)}
 .dtable td{font-weight:700;font-variant-numeric:tabular-nums}
+
+/* number line taps, charts to draw on, rulers */
+.nl-tap{fill:transparent;cursor:pointer}
+.nl-tap.picked,.nl-tap.wrongpick{fill:var(--bad);opacity:.35}
+.nl-tap.right{fill:var(--good);opacity:.45}
+.nl-arrow{fill:var(--accent)}
+.nl-arrow.end{fill:var(--share)}
+.chart.make .seg{cursor:pointer}
+.seg-hit{fill:transparent}
+.seg-bar{fill:transparent}
+.seg-pt{display:none;fill:var(--accent)}
+.seg.on:not(.pt) .seg-bar{fill:var(--accent);opacity:.85}
+.seg.pt.top .seg-pt{display:block}
+.seg.want:not(.pt) .seg-bar{stroke:var(--good);stroke-width:3;stroke-dasharray:6 4;fill-opacity:.15}
+.seg.pt.wanttop .seg-pt{display:block;fill:none;stroke:var(--good);stroke-width:3}
+.ruler{width:100%;max-width:620px;margin:0 auto}
+.ruler svg{width:100%;height:auto;display:block}
+.ru-body{fill:#f6e7b4;stroke:#b8963a;stroke-width:2}
+.ru-tick{stroke:#3d2e00;stroke-width:1.4}
+.ru-num{fill:#3d2e00;font-size:15px;font-weight:700;text-anchor:middle}
+.ru-obj{fill:var(--accent)}
+.ru-tip{fill:#e2a170}
+.ru-guide{stroke:var(--muted);stroke-width:1.5;stroke-dasharray:4 3}

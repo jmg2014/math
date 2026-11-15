@@ -191,6 +191,95 @@ const sharing = {
   }
 };
 
+/* ---------- Mental maths: derived facts and swapping the order ---------- */
+const mental = {
+  id:"md-mental", name:"Mental maths", emoji:"💡",
+  desc:"Use facts you know to work out bigger ones: 6 × 4 = 24, so 60 × 4 = 240 and 240 ÷ 6 = 40. And the order doesn't matter in multiplication: 7 × 8 = 8 × 7.",
+  levels:[
+    { name:"Swap and × 10, × 100", desc:"7 × 8 = 8 × □ · 6 × 10 · 45 × 100" },
+    { name:"Tens", desc:"60 × 4 · 7 × 80 · 240 ÷ 6" },
+    { name:"Hundreds, and using a fact", desc:"300 × 7 · 2400 ÷ 6 · 13 × 4 = 52, so 4 × 13 = □" }
+  ],
+  make(lv){
+    const a = rnd(2, 12), b = rnd(2, 12), p = a * b;
+    if (lv === 1){
+      const form = rnd(1, 3);
+      if (form === 1) return { text:`${a} × ${b} = ${b} × □`, answer:a, key:`sw${a}x${b}`,
+        explain:`□ = <b>${a}</b><span class="why">Order doesn't matter when you multiply: ${a} × ${b} and ${b} × ${a} are both ${p}.</span>`, solution:`${a} × ${b} = ${b} × ${a}` };
+      const n = form === 2 ? rnd(2, 99) : rnd(2, 99), by = form === 2 ? 10 : 100;
+      return { text:`${n} × ${by} =`, answer:n * by, maxLen:5, key:`${n}x${by}`,
+        explain:`<b>${n * by}</b><span class="why">× ${by}: every digit moves ${by === 10 ? "one place" : "two places"} to the left.</span>`, solution:`${n} × ${by} = ${n * by}` };
+    }
+    if (lv === 2){
+      const form = rnd(1, 3), t = a * 10;
+      if (form === 1) return { text:`${t} × ${b} =`, answer:t * b, maxLen:4, key:`${t}x${b}`,
+        explain:`<b>${t * b}</b><span class="why">${a} × ${b} = ${p}, so ${t} × ${b} is ten times bigger: ${t * b}</span>`, solution:`${t} × ${b} = ${t * b}` };
+      if (form === 2) return { text:`${b} × ${t} =`, answer:t * b, maxLen:4, key:`${b}x${t}`,
+        explain:`<b>${t * b}</b><span class="why">${b} × ${a} = ${p}, so ${b} × ${t} = ${t * b}</span>`, solution:`${b} × ${t} = ${t * b}` };
+      return { text:`${p * 10} ÷ ${b} =`, answer:a * 10, key:`${p * 10}/${b}`,
+        explain:`<b>${a * 10}</b><span class="why">${p} ÷ ${b} = ${a}, so ${p * 10} ÷ ${b} is ten times bigger: ${a * 10}</span>`, solution:`${p * 10} ÷ ${b} = ${a * 10}` };
+    }
+    const form = rnd(1, 4);
+    if (form === 1){ const h = rnd(2, 9) * 100, m = rnd(2, 9);
+      return { text:`${h} × ${m} =`, answer:h * m, maxLen:4, key:`${h}x${m}`,
+        explain:`<b>${h * m}</b><span class="why">${h / 100} × ${m} = ${h / 100 * m}, so ${h} × ${m} is a hundred times bigger: ${h * m}</span>`, solution:`${h} × ${m} = ${h * m}` }; }
+    if (form === 2) return { text:`${p * 100} ÷ ${b} =`, answer:a * 100, maxLen:4, key:`${p * 100}/${b}`,
+      explain:`<b>${a * 100}</b><span class="why">${p} ÷ ${b} = ${a}, so ${p * 100} ÷ ${b} = ${a * 100}</span>`, solution:`${p * 100} ÷ ${b} = ${a * 100}` };
+    const x = rnd(13, 25), y = rnd(3, 9), q = x * y;
+    if (form === 3) return { text:`${x} × ${y} = ${q}. So what is ${y} × ${x}?`, answer:q, key:`use${x}x${y}`,
+      explain:`<b>${q}</b><span class="why">Swapping the order doesn't change the answer.</span>`, solution:`${y} × ${x} = ${x} × ${y} = ${q}` };
+    return { text:`${x} × ${y} = ${q}. So what is ${q} ÷ ${y}?`, answer:x, key:`inv${x}x${y}`,
+      explain:`<b>${x}</b><span class="why">Division undoes multiplication: ${x} × ${y} = ${q}, so ${q} ÷ ${y} = ${x}.</span>`, solution:`${q} ÷ ${y} = ${x}` };
+  }
+};
+
+/* ---------- Multiply and add: grouping, splitting (distributive law), scaling, how many combinations ---------- */
+const PACKS = [["eggs", "boxes", 6], ["pencils", "packs", 10], ["cakes", "trays", 12], ["stickers", "sheets", 8], ["crayons", "tubs", 9], ["biscuits", "packets", 7]];
+const problemsMD = {
+  id:"md-problems", name:"Multiply and add problems", emoji:"🧩",
+  desc:"Some problems need multiplying and adding. You can split a number to multiply it: 39 × 7 = 30 × 7 + 9 × 7. “4 times as many” means multiply by 4. To count combinations, multiply the choices.",
+  levels:[
+    { name:"Groups and extras", desc:"4 boxes of 6 eggs and 3 loose eggs" },
+    { name:"Splitting and scaling", desc:"39 × 7 = 30 × 7 + 9 × 7 · 4 times as tall" },
+    { name:"Combinations", desc:"3 tops and 4 skirts: how many outfits?" }
+  ],
+  make(lv){
+    const NAMES = ["Amir", "Bella", "Chen", "Dev", "Ella", "Femi", "Grace", "Hugo", "Isla", "Jack", "Kemi", "Leo", "Maya", "Noah", "Priya", "Zara"];
+    if (lv === 1){
+      const [thing, group, size] = pick(PACKS), g = rnd(2, 9), extra = rnd(1, size - 1), who = pick(NAMES), tot = g * size + extra;
+      return { text:`${thing[0].toUpperCase() + thing.slice(1)} come in ${group} of ${size}. ${who} has ${g} full ${group} and ${extra} more ${thing}. How many ${thing} altogether?`,
+        answer:tot, key:`gr${thing}${g}${extra}`,
+        explain:`<b>${tot}</b><span class="why">Step 1: ${g} × ${size} = ${g * size}<br>Step 2: ${g * size} + ${extra} = ${tot}</span>`, solution:`${g} × ${size} + ${extra} = ${tot}` };
+    }
+    if (lv === 2){
+      if (Math.random() < .5){
+        const t = rnd(2, 9), o = rnd(1, 9), m = rnd(3, 9), n = t * 10 + o, r = n * m;
+        return { text:`Split ${n} into ${t * 10} and ${o} to work out ${n} × ${m}.`, answer:r, maxLen:4, key:`sp${n}x${m}`,
+          explain:`<b>${r}</b><span class="why">${t * 10} × ${m} = ${t * 10 * m}, and ${o} × ${m} = ${o * m}.<br>${t * 10 * m} + ${o * m} = ${r}</span>`, solution:`${n} × ${m} = ${t * 10 * m} + ${o * m} = ${r}` };
+      }
+      const k = rnd(2, 6);
+      const [unit, make] = pick([
+        ["kg", (b, k) => `A puppy weighs ${b} kg. Its mum is ${k} times as heavy. How heavy is its mum?`],
+        ["cm", (b, k) => `A toy car is ${b} cm long. A toy bus is ${k} times as long. How long is the toy bus?`],
+        ["cm", (b, k) => `A seedling is ${b} cm tall. A month later it is ${k} times as tall. How tall is it now?`],
+        ["ml", (b, k) => `A small jug holds ${b} ml. A big jug holds ${k} times as much. How much does the big jug hold?`]]);
+      const base = unit === "ml" ? rnd(2, 9) * 50 : rnd(3, 25), r = base * k;
+      return { text:make(base, k), answer:r, suffix:` ${unit}`, maxLen:4, key:`sc${unit}${base}x${k}`,
+        explain:`<b>${r} ${unit}</b><span class="why">${k} times as much means × ${k}: ${base} × ${k} = ${r}</span>`, solution:`${base} × ${k} = ${r} ${unit}` };
+    }
+    const [x, y, xs, ys, what] = pick([
+      [rnd(2, 6), rnd(2, 6), "tops", "skirts", "outfits"], [rnd(2, 6), rnd(2, 6), "starters", "main courses", "different meals"],
+      [rnd(2, 8), rnd(2, 5), "ice cream flavours", "toppings", "different ice creams (one flavour and one topping)"],
+      [rnd(2, 6), rnd(2, 6), "hats", "scarves", "different hat-and-scarf pairs"]]);
+    if (Math.random() < .3){                         // work backwards
+      return { text:`There are ${x * y} ${what}, made from ${x} ${xs} and some ${ys}. How many ${ys} are there?`, answer:y, key:`cb${x}${y}${xs}`,
+        explain:`<b>${y}</b><span class="why">${x} × □ = ${x * y}, so □ = ${x * y} ÷ ${x} = ${y}</span>`, solution:`${x} × ${y} = ${x * y} ${what}` };
+    }
+    return { text:`You can choose one of ${x} ${xs} and one of ${y} ${ys}. How many ${what} are there?`, answer:x * y, key:`cm${x}${y}${xs}`,
+      explain:`<b>${x * y}</b><span class="why">Each of the ${x} ${xs} goes with each of the ${y} ${ys}: ${x} × ${y} = ${x * y}</span>`, solution:`${x} × ${y} = ${x * y} ${what}` };
+  }
+};
+
 Y4.TOPICS.push({ id:"multiply-divide", title:"Multiplication & Division", emoji:"➗",
-  skills:[divFacts, special, factors, written, sharing] });
+  skills:[divFacts, special, mental, factors, written, problemsMD, sharing] });
 })();

@@ -227,6 +227,40 @@ const timeGraphs = {
   }
 };
 
+/* ---------- Make a chart: present data by drawing bars and plotting points ---------- */
+const makeChart = {
+  id:"st-make", name:"Make a chart", emoji:"✏️",
+  desc:"Present the data yourself! Tap a column to make its bar reach the right number (tap the top again to make it one smaller). For a time graph, tap to put each point at the right height. Then press Check.",
+  levels:[
+    { name:"Draw the bars", desc:"Scale in 1s: draw the missing bars from the table" },
+    { name:"Bigger scales", desc:"Scales in 2s, 5s and 10s" },
+    { name:"Plot a time graph", desc:"Put the missing points on the graph" }
+  ],
+  make(lv){
+    if (lv < 3){
+      const th = pick(THEMES), items = shuffle(th.items.slice()).slice(0, 4);
+      const step = lv === 1 ? 1 : pick([2, 5, 10]), vals = distinct(4, () => step * rnd(1, 10));
+      const todo = shuffle([0, 1, 2, 3]).slice(0, lv === 1 ? 2 : 3);
+      const answer = {}; todo.forEach(i => { answer[items[i]] = vals[i] / step; });
+      const table = `<div><div class="ch-title">${th.title}</div>${D().table(["", "Number"], items.map((it, j) => [it, vals[j]]))}</div>`;
+      const chart = D().makeChart(items, vals.map((v, i) => todo.includes(i) ? null : v), { step, max:step * 10, kind:"bar", yLabel:"Number of children" });
+      return { text:`Use the table to draw the missing bars${step > 1 ? ` (each line on the scale is ${step})` : ""}. Then press Check.`, picture:table + chart, input:"bars", answer, unit:step,
+        key:items.join() + vals.join() + todo.join(),
+        explain:`Like this<span class="why">${todo.map(i => `${items[i]}: ${vals[i]}`).join(" · ")}. Find the number on the scale, then make the bar reach that line.</span>${D().barChart(items, vals, { step, max:step * 10, title:th.title })}`,
+        solution:todo.map(i => `${items[i]} = ${vals[i]}`).join(", ") };
+    }
+    const G = pick(GRAPHS.filter(g => !g.grow)), ys = graphData(G, false), xs = G.xs.slice(0, 6), y6 = ys.slice(0, 6);
+    const todo = shuffle([0, 1, 2, 3, 4, 5]).slice(0, 3).sort((a, b) => a - b);
+    const answer = {}; todo.forEach(i => { answer[xs[i]] = y6[i] / G.step; });
+    const table = D().table(["Time", G.yLabel === "°C" ? "°C" : "Children"], xs.map((x, i) => [x, y6[i]]));
+    const chart = D().makeChart(xs, y6.map((v, i) => todo.includes(i) ? null : v), { step:G.step, max:G.max, kind:"line", title:G.title, yLabel:G.yLabel });
+    return { text:"Use the table to plot the missing points on the time graph. Then press Check.", picture:table + chart, input:"bars", answer, unit:G.step,
+      key:G.title + y6.join() + todo.join(),
+      explain:`Like this<span class="why">${todo.map(i => `${xs[i]}: ${y6[i]}`).join(" · ")}. Find the time along the bottom, then go up to the right number.</span>${D().lineGraph(xs, y6, { step:G.step, max:G.max, title:G.title, yLabel:G.yLabel })}`,
+      solution:todo.map(i => `${xs[i]} = ${y6[i]}`).join(", ") };
+  }
+};
+
 Y4.TOPICS.push({ id:"statistics", title:"Statistics", emoji:"📊",
-  skills:[bars, pictograms, tables, timeGraphs] });
+  skills:[bars, makeChart, pictograms, tables, timeGraphs] });
 })();

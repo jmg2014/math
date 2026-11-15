@@ -159,12 +159,24 @@ const symmetry = {
   id:"ge-symmetry", name:"Symmetry", emoji:"🦋",
   desc:"A line of symmetry is a mirror line: if you folded the shape along it, the two halves would match exactly.",
   levels:[
-    { name:"Is it a mirror line?", desc:"Yes or no" },
-    { name:"Count the lines", desc:"How many lines of symmetry does the shape have?" },
+    { name:"Is it a mirror line?", desc:"Yes or no, including slanting lines" },
+    { name:"Count the lines", desc:"How many lines of symmetry? Shapes can be turned any way" },
     { name:"Complete the shape", desc:"Tap squares to make the shape symmetrical" }
   ],
   make(lv){
     if (lv === 1){
+      if (Math.random() < .35){                      // a diagonal mirror line, corner to corner of a square grid
+        const half = [...new Map(halfShape(6, 6, rnd(4, 9)).map(([r, c]) => r >= c ? [r, c] : [c, r]).map(x => [keyOf(x), x])).values()];   // fold below the line
+        const full = [...half, ...half.map(([r, c]) => [c, r])];
+        const spoil = Math.random() < .5;
+        let shape = full;
+        if (spoil){ const extra = pick([[rnd(1, 5), 0], [0, rnd(1, 5)], [rnd(2, 5), rnd(0, 1)]]); const set = new Set(full.map(keyOf));
+          shape = set.has(keyOf(extra)) ? full.filter(c => keyOf(c) !== keyOf(extra)) : [...full, extra]; }
+        const yes = isSymmetric(shape, ([r, c]) => [c, r]), ans = yes ? "Yes" : "No";
+        return { text:"Is the dashed line a line of symmetry?", picture:Y4.draw.symGrid(shape, 6, 6, { d:true }), input:"choice", choices:["Yes", "No"], answer:ans,
+          key:JSON.stringify(shape) + "d", explain:`<b>${ans}</b><span class="why">${yes ? "Fold along the slanting line: each square lands exactly on its partner." : "Fold along the slanting line: some squares don't land on a matching square."} Mirror lines can be slanting, not just up-and-down or across.</span>`,
+          solution:`Slanting line of symmetry? ${ans}` };
+      }
       const half = halfShape(5, 3, rnd(4, 8)), cells = [...half, ...half.map(([r, c]) => [r, 5 - c])];
       const form = rnd(1, 3);
       let shape = cells, line, mirror;
@@ -182,9 +194,10 @@ const symmetry = {
     if (lv === 2){
       const [name, n] = pick(LINES);
       let pic;
-      if (name === "pentagon" || name === "hexagon") pic = Y4.draw.polygon(regular(name === "pentagon" ? 5 : 6), { ticks:Object.fromEntries(Array.from({ length:name === "pentagon" ? 5 : 6 }, (_, i) => [i, 1])) });
-      else if (name === "isotrap") pic = Y4.draw.polygon([[.6, 0], [2.4, 0], [3, 1.3], [0, 1.3]], { ticks:{ 1:1, 3:1 } });
-      else { const s = SHAPES[name](); pic = Y4.draw.polygon(s.pts, { ticks:s.ticks, right:s.right }); }
+      const turn = rnd(0, 359);                      // shapes come in different orientations
+      if (name === "pentagon" || name === "hexagon") pic = Y4.draw.polygon(rotate(regular(name === "pentagon" ? 5 : 6), turn), { ticks:Object.fromEntries(Array.from({ length:name === "pentagon" ? 5 : 6 }, (_, i) => [i, 1])) });
+      else if (name === "isotrap") pic = Y4.draw.polygon(rotate([[.6, 0], [2.4, 0], [3, 1.3], [0, 1.3]], turn), { ticks:{ 1:1, 3:1 } });
+      else { const s = SHAPES[name](); pic = Y4.draw.polygon(rotate(s.pts, turn), { ticks:s.ticks, right:s.right }); }
       const nice = NICE[name] || name;
       return { text:`How many lines of symmetry does this ${nice} have?`, picture:pic, answer:n, key:name,
         explain:`<b>${n}</b><span class="why">A ${nice} has ${n} line${n === 1 ? "" : "s"} of symmetry.${n === 0 ? " There is no way to fold it so the halves match." : ""}</span>`,

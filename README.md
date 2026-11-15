@@ -101,7 +101,7 @@ Saving a backup now and then is also a good idea in case the browser's data gets
   2 new skills to try, mastered skills that haven't been practised for a week, and 2 tricky times tables facts.
   Doing it on days in a row builds a 🔥 streak. It can be played more than once a day.
 - **Topic tiles:** one for each part of the curriculum, showing the stars earned so far.
-- **🗺️ Curriculum map:** every line of the Year 4 curriculum, marked ○ not started, ◐ learning or ✓ mastered
+- **🗺️ Curriculum map:** every one of the 42 Year 4 curriculum statements, marked ○ not started, ◐ learning or ✓ mastered
   (mastered = a ⭐ in every skill for that line). Tap a line to go straight to its practice.
 - **👪 For grown-ups:** questions answered, % right first time and minutes spent in the last 7 days; a chart of
   questions answered each week (tap a bar for details, or show it as a table); the skills that need the most help;
@@ -123,8 +123,10 @@ A wrong answer shows the working and waits for **Next ▶**. A similar question 
 |---|---|---|---|
 | ➗ Division facts | ÷ 2, 3, 4, 5, 10 | ÷ any number to 12 | Missing numbers: □ ÷ 6 = 8 |
 | 🎲 × 0, × 1 and 3 numbers | 23 × 0, 37 ÷ 1, 12 ÷ 12 | 2 × 3 × 4 | 7 × 5 × 2 (pick the easy pair first) |
+| 💡 Mental maths | 7 × 8 = 8 × □ · 45 × 100 | 60 × 4 · 240 ÷ 6 (derived facts) | 300 × 7 · 2400 ÷ 6 · "13 × 4 = 52, so 4 × 13 = □" |
 | 🧩 Factor pairs | 6 × □ = 24 | Is 7 a factor of 42? | How many factor pairs does 36 have? |
 | 📝 Written multiplication | 32 × 3 (no carrying) | 47 × 6 | 347 × 6 (answer typed into the sum, ones first) |
+| 🧩 Multiply and add problems | 4 boxes of 6 eggs and 3 more | 39 × 7 = 30 × 7 + 9 × 7 · "4 times as tall" | How many outfits from 3 tops and 4 skirts? |
 | 🍰 Sharing problems | 1 pizza between 4 → ¼ | 3 cakes between 10 → 3/10, with pictures | Word problems, working backwards |
 
 **Column sums** (written multiplication, column addition and subtraction): the answer is typed under the line,
@@ -145,7 +147,9 @@ Works the same way as Multiplication & Division: one tab for each skill, 3 level
 | 🏠 Place value | Value of the 7 in 3742 | 3742 = 3000 + □ + 40 + 2 | 4 thousands and 7 tens; jumbled parts |
 | ⚖️ Compare and order | Which is bigger? | 4352 ◯ 4325 (<, > or =) | Smallest or largest of four |
 | 🎯 Rounding | Nearest 10 | Nearest 100 | Nearest 1000 |
-| 🏛️ Roman numerals | Read I to XX | Read up to C | Pick the right one for a number |
+| 📍 Number lines | Read the arrow (0–100, 0–1000) | Estimate where the arrow points | Tap where 6500 goes |
+| 🧠 Number problems | 1000 more in a story · which mountain is higher? | Rounding in the news · biggest number from digit cards | "Rounds to 350: smallest it could be?" |
+| 🏛️ Roman numerals | Read I to XX | Read up to C | Pick the right one for a number · Roman numerals had no zero |
 
 **Negative answers:** type the number, then tap **Make it negative −**.
 Wrong answers show the working with a number line or a place value chart.
@@ -169,7 +173,7 @@ A wrong column sum shows the working column by column, with every carry and exch
 | ➕ Add and subtract fractions | 1/5 + 2/5, with bars | 7/9 − 4/9 | 1 − 3/8 · three fractions · missing number |
 | 🍬 Fraction of an amount | ⅓ of 24 | ¾ of 20 | Word problems, and "¼ of a number is 6" |
 | 🔟 Tenths and hundredths | 3/10 = 0.3 | 47/100 = 0.47 (hundred square) · ¼ ½ ¾ | Counting in tenths and hundredths · how many hundredths in 0.6? |
-| ➗ ÷ 10 and ÷ 100 | 35 ÷ 10 = 3.5 | 35 ÷ 100 = 0.35 | □ ÷ 10 = 4.6 · 63 ÷ □ = 0.63 |
+| ➗ ÷ 10 and ÷ 100 | 35 ÷ 10 = 3.5 | 35 ÷ 100 = 0.35 · 0.3 ÷ 10 = 0.03 | □ ÷ 10 = 4.6 · 63 ÷ □ = 0.63 |
 | ⚖️ Round and compare decimals | Round 3.7 to a whole number | 0.4 ◯ 0.38 | Largest or smallest of four |
 | 💷 Money and measures | £3.45 = □p · £2.35 + £1.40 | Change from £5, £10 or £20 | Two-step change, ribbon lengths, weights |
 
@@ -181,7 +185,8 @@ Money answers show **£** in the answer box, so only the number is typed.
 | Skill | Level 1 | Level 2 | Level 3 |
 |---|---|---|---|
 | 📏 Converting units | 3 m = □ cm · 4000 g = □ kg | 2 m 35 cm = □ cm · 2 hours 15 minutes = □ minutes | 1.5 km = □ m · 350 cm = □ m · which is longer? |
-| 📐 Perimeter | Rectangles on squared paper | L, T and step shapes on squared paper | Labelled rectangles and L shapes · find a missing side |
+| 📐 Estimate and measure | Is a pencil 15 cm, 15 m or 15 mm? | Estimate mass, capacity and time | Measure with a ruler, in cm or mm |
+| 📐 Perimeter | Rectangles on squared paper (cm or m) | L, T and step shapes on squared paper | Labelled rectangles and L shapes, in cm or m · find a missing side |
 | ⬛ Area | Rectangles on squared paper | L, T and step shapes on squared paper | Labelled rectangles and L shapes |
 | 🕒 Telling the time | Read a clock (to 5 minutes) | To the minute · 3:45 pm = 15:45 · 18:20 = 6:20 pm | When does it end? · minutes between · 25 minutes later |
 | 💰 Money | Count coins and notes | Add up prices from a price list | 4 tickets at £3.25 · how many pens for £2? · share equally |
@@ -195,11 +200,15 @@ When reading a clock, both 7:45 and 19:45 count.
 |---|---|---|---|
 | 🔷 Triangles and quadrilaterals | Equilateral, isosceles or scalene? | Square, rectangle, rhombus, parallelogram, trapezium or kite? | Properties: "exactly one pair of parallel sides?" · "is every square a rectangle?" |
 | 📐 Angles | Acute, right or obtuse? | Biggest or smallest of three · put in order | Clock hands · right angles inside a shape · turns |
-| 🦋 Symmetry | Is the dashed line a mirror line? | How many lines of symmetry? | Tap squares to complete a symmetrical shape |
+| 🦋 Symmetry | Is the dashed line a mirror line? (including slanting lines) | How many lines of symmetry? (shapes turned any way) | Tap squares to complete a symmetrical shape |
 | 📍 Coordinates | Read a point (across first, then up) | Tap a point on the grid | Move a point · describe a move · the 4th corner of a rectangle |
 
-**Tapping answers:** some questions are answered by tapping the picture: a point on the grid, or squares to colour
-(tap again to clear a square, then press **Check ✓**). Afterwards, green shows the right answer and red shows a mistake.
+**Tapping answers:** some questions are answered by tapping the picture: a point on the grid or a number line, or squares
+to colour (tap again to clear a square, then press **Check ✓**). Afterwards, green shows the right answer and red shows a mistake.
+
+**Drawing charts:** in *Make a chart*, tap a column to make its bar reach that line (tap the top again to make it one
+smaller), or tap to place a point on a time graph, then press **Check ✓**. A wrong bar or point is outlined in green
+at the right height.
 
 ## 📊 Statistics
 
@@ -207,6 +216,7 @@ All the charts and tables are made up at random, so there's always new data to r
 
 | Skill | Level 1 | Level 2 | Level 3 |
 |---|---|---|---|
+| ✏️ Make a chart | Draw the missing bars from a table | Scales in 2s, 5s and 10s | Plot the missing points on a time graph |
 | 📊 Bar charts | Read bars (scales in 1s and 2s) · tap the most popular | Scales in 2s, 5s and 10s (halfway readings) · how many more? | How many altogether? · "X or Y" · two-step questions |
 | 🍎 Pictograms | Each picture = 2, with half pictures | Each picture = 4 or 10 · how many more? | Totals · how many pictures would show 40? |
 | 📋 Tally charts and tables | Count tally marks | Tables: how many more? altogether? most popular? | Two-way tables: boys and girls |

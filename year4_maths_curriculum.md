@@ -10,51 +10,59 @@
 - Count backwards through zero into negative numbers
 - Know the value of each digit in a 4-digit number (thousands, hundreds, tens, ones)
 - Order and compare numbers beyond 1000
+- Identify, show and estimate numbers in different ways (for example on a number line)
 - Round any number to the nearest 10, 100 or 1000
-- Read Roman numerals up to 100 (I to C)
+- Solve number and practical problems using all of the above, with bigger and bigger numbers
+- Read Roman numerals up to 100 (I to C), and know that over time number systems changed to include zero and place value
 
 ## 2. Addition and subtraction
 - Add and subtract numbers with up to 4 digits using the column method
 - Estimate answers, and use the inverse operation to check them
-- Solve two-step word problems and choose which operation to use
+- Solve two-step word problems, deciding which operations and methods to use and why
 
 ## 3. Multiplication and division
 - ⭐ **Know all times tables up to 12 × 12, plus the matching division facts**
-- Multiply and divide mentally, including by 0 and 1, and multiply three numbers together
+- Multiply and divide mentally using place value and known and derived facts (60 × 4 from 6 × 4), including × 0, × 1, ÷ 1 and multiplying three numbers together
 - Use factor pairs, and know that order doesn't matter in multiplication (3 × 4 = 4 × 3)
 - Multiply 2-digit and 3-digit numbers by a 1-digit number using the written method
-- Solve problems such as "3 cakes shared between 10 children"
+- Solve problems that involve multiplying and adding: splitting numbers to multiply (39 × 7 = 30 × 7 + 9 × 7), "times as many" scaling, and correspondence problems such as how many outfits from 3 tops and 4 skirts, or 3 cakes shared between 10 children
 
 ## 4. Fractions and decimals
-- Recognise equivalent fractions (e.g. 6/9 = 2/3)
-- Count up and down in hundredths
+- Recognise and show families of equivalent fractions with diagrams (e.g. 6/9 = 2/3)
+- Count up and down in hundredths, and know that hundredths come from dividing something by 100, or tenths by 10
+- Find fractions of amounts, including non-unit fractions (e.g. ¾ of 20)
 - Add and subtract fractions with the same denominator
-- Find fractions of amounts (e.g. ¾ of 20)
-- Write tenths and hundredths as decimals; know ¼ = 0.25, ½ = 0.5, ¾ = 0.75
-- Divide 1- and 2-digit numbers by 10 and 100
+- Write any number of tenths or hundredths as a decimal
+- Know that ¼ = 0.25, ½ = 0.5 and ¾ = 0.75
+- Divide 1- and 2-digit numbers by 10 and 100, and say what each digit is worth in the answer (ones, tenths, hundredths)
 - Round decimals with one decimal place to the nearest whole number
 - Compare decimals with up to 2 decimal places
-- Solve money and measure problems with decimals
+- Solve simple money and measure problems with fractions and decimals
 
 ## 5. Measurement
 - Convert between units (km ↔ m, hours ↔ minutes, and so on)
-- Work out the perimeter of rectangles and similar shapes
+- Measure and work out the perimeter of rectangles and other straight-sided shapes, in centimetres and metres
 - Find area by counting squares
-- Calculate with money (£ and p)
-- Read and convert time between analogue, digital, 12-hour and 24-hour clocks
+- Estimate, compare and calculate measures, including money in pounds and pence
+- Read, write and convert time between analogue and digital, 12-hour and 24-hour clocks
+- Solve problems converting hours to minutes, minutes to seconds, years to months and weeks to days
 
 ## 6. Geometry: shapes
-- Sort triangles (isosceles, equilateral, scalene) and quadrilaterals (parallelogram, rhombus, trapezium)
-- Identify acute and obtuse angles, and order angles by size
-- Find lines of symmetry and complete symmetric shapes
+- Compare and sort shapes, including triangles (isosceles, equilateral, scalene) and quadrilaterals (square, rectangle, rhombus, parallelogram, trapezium, kite), by their properties and sizes
+- Identify acute and obtuse angles, and order angles up to two right angles by size
+- Find lines of symmetry in shapes that are turned different ways
+- Complete a symmetric shape on a given line of symmetry
 
 ## 7. Geometry: position and direction
-- Plot coordinates such as (2, 5) on a grid
+- Describe positions on a grid as coordinates, such as (2, 5)
 - Describe moves on a grid (left/right, up/down)
+- Plot points and draw sides to complete a shape
 
 ## 8. Statistics
-- Read and draw bar charts, pictograms, tables and time graphs
-- Answer questions such as "how many more?" from a chart
+- Read and draw (present) bar charts and time graphs, and read pictograms and tables
+- Answer comparison, sum and difference questions such as "how many more?" from charts, pictograms and tables
+
+*Every statement above matches one of the statutory "pupils should be taught to" points in the official Year 4 programme of study.*
 
 ---
 

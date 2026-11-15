@@ -195,13 +195,19 @@ const tenths = {
 /* ---------- Dividing by 10 and 100 ---------- */
 const divide = {
   id:"fr-divide", name:"÷ 10 and ÷ 100", emoji:"➗",
-  desc:"When you divide by 10, every digit moves one place to the right. When you divide by 100, every digit moves two places to the right.",
+  desc:"When you divide by 10, every digit moves one place to the right: ones become tenths, and tenths become hundredths. When you divide by 100, every digit moves two places to the right.",
   levels:[
     { name:"÷ 10", desc:"7 ÷ 10 = 0.7   ·   35 ÷ 10 = 3.5" },
-    { name:"÷ 100", desc:"7 ÷ 100 = 0.07   ·   35 ÷ 100 = 0.35" },
+    { name:"÷ 100, and tenths ÷ 10", desc:"35 ÷ 100 = 0.35   ·   0.3 ÷ 10 = 0.03" },
     { name:"Missing numbers", desc:"□ ÷ 10 = 4.6   ·   63 ÷ □ = 0.63" }
   ],
   make(lv){
+    if (lv > 1 && Math.random() < .35){              // tenths ÷ 10 make hundredths: 0.3 ÷ 10 = 0.03, 4.7 ÷ 10 = 0.47
+      const t = Math.random() < .5 ? rnd(1, 9) : rnd(11, 99), v = dec(t / 10), r = dec(t / 100);
+      return { text:`${v} ÷ 10 =`, input:"decimal", answer:t / 100, key:`t${t}/10`,
+        explain:`<b>${r}</b><span class="why">Dividing by 10 moves every digit one place to the right, so tenths become hundredths.${t < 10 ? ` ${t} tenth${t === 1 ? "" : "s"} ÷ 10 = ${t} hundredth${t === 1 ? "" : "s"}.` : ""}</span>${Y4.draw.decimalChart([[v, ""], [r, "÷ 10"]])}`,
+        solution:`${v} ÷ 10 = ${r}` };
+    }
     const n = Math.random() < .35 ? rnd(1, 9) : rnd(11, 99);
     if (lv < 3 || Math.random() < .3){
       const by = lv === 1 ? 10 : lv === 2 ? 100 : pick([10, 100]), r = dec(n / by);

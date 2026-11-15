@@ -102,13 +102,13 @@ const { $, prog:P, rnd, pick, shuffle } = Y4;
 /* The 8 parts of the Year 4 curriculum */
 const TOPICS = [
   { id:"times-tables",    emoji:"✖️", name:"Times Tables",              path:"times-tables/",    desc:"All tables to 12 × 12, and the Multiplication Tables Check" },
-  { id:"multiply-divide", emoji:"➗", name:"Multiplication & Division", path:"multiply-divide/", desc:"Division facts, factor pairs, written method, sharing problems" },
-  { id:"number",          emoji:"🔢", name:"Number & Place Value",      path:"number/",          desc:"Thousands, rounding, negative numbers, Roman numerals" },
+  { id:"multiply-divide", emoji:"➗", name:"Multiplication & Division", path:"multiply-divide/", desc:"Division facts, mental maths, factor pairs, written method, problems" },
+  { id:"number",          emoji:"🔢", name:"Number & Place Value",      path:"number/",          desc:"Thousands, number lines, rounding, negative numbers, Roman numerals" },
   { id:"add-subtract",    emoji:"➕", name:"Addition & Subtraction",    path:"add-subtract/",    desc:"Column method, estimating, two-step problems" },
   { id:"fractions",       emoji:"🍕", name:"Fractions & Decimals",      path:"fractions/",       desc:"Equivalent fractions, tenths and hundredths, ¾ of 20" },
-  { id:"measurement",     emoji:"📏", name:"Measurement",               path:"measurement/",     desc:"Units, perimeter, area, money, time" },
+  { id:"measurement",     emoji:"📏", name:"Measurement",               path:"measurement/",     desc:"Units, estimating, perimeter, area, money, time" },
   { id:"shapes",          emoji:"🔷", name:"Shapes & Position",         path:"shapes/",          desc:"Triangles, angles, symmetry, coordinates" },
-  { id:"statistics",      emoji:"📊", name:"Statistics",                path:"statistics/",      desc:"Bar charts, pictograms, tables, time graphs" }
+  { id:"statistics",      emoji:"📊", name:"Statistics",                path:"statistics/",      desc:"Read and make bar charts, pictograms, tables, time graphs" }
 ];
 const allSkills = () => Y4.TOPICS.flatMap(T => T.skills.map(s => ({ s, T })));
 const HARD = [6, 7, 8, 9, 12];

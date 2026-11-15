@@ -45,7 +45,7 @@ Y4.draw = {
   },
   /* a number line from lo to hi with a tick every `step` (labelled every `labelEvery` ticks).
      points: [{ v, cls:"start"|"end"|"", label }] are drawn as dots, with an optional label above */
-  numberLine(lo, hi, step, points, labelEvery){
+  numberLine(lo, hi, step, points, labelEvery, tapStep){
     const W = 640, pad = 28, y = 52, n = Math.round((hi - lo) / step), le = labelEvery || 1;
     const x = v => pad + (v - lo) / (hi - lo) * (W - 2 * pad);
     let h = `<line x1="${pad - 14}" y1="${y}" x2="${W - pad + 14}" y2="${y}" class="nl-axis"/>`;
@@ -54,11 +54,24 @@ Y4.draw = {
       h += `<line x1="${x(v)}" y1="${y - (big ? 9 : 5)}" x2="${x(v)}" y2="${y + (big ? 9 : 5)}" class="nl-axis"/>`;
       if (big) h += `<text x="${x(v)}" y="${y + 30}" class="nl-num ${v === 0 ? "zero" : ""}">${Y4.num(v)}</text>`;
     }
+    if (tapStep){                                    // every tapStep along the line can be tapped (answer: its value)
+      const k = Math.round((hi - lo) / tapStep), w = (W - 2 * pad) / k;
+      for (let i = 0; i <= k; i++){
+        const v = +(lo + i * tapStep).toFixed(6);
+        h += `<rect x="${x(v) - w / 2}" y="${y - 30}" width="${w}" height="60" class="nl-tap" data-tap="${v}"/>`;
+      }
+    }
     (points || []).forEach(p => {
+      if (p.arrow){                                  // an arrow pointing down at the line
+        h += `<path d="M${x(p.v)},${y - 6} l-9,-16 h6 v-16 h6 v16 h6 Z" class="nl-arrow ${p.cls || ""}"/>`;
+        if (p.label) h += `<text x="${x(p.v)}" y="${y - 44}" class="nl-lab">${p.label}</text>`;
+        return;
+      }
       h += `<circle cx="${x(p.v)}" cy="${y}" r="9" class="nl-pt ${p.cls || ""}"/>`;
       if (p.label) h += `<text x="${x(p.v)}" y="${y - 18}" class="nl-lab">${p.label}</text>`;
     });
-    return `<div class="nl"><svg viewBox="0 0 ${W} 96" aria-hidden="true">${h}</svg></div>`;
+    const top = (points || []).some(p => p.arrow && p.label) ? 64 : 0;
+    return `<div class="nl"><svg viewBox="0 ${-top} ${W} ${96 + top}" aria-hidden="true">${h}</svg></div>`;
   },
   /* a place value chart: Th H T O */
   placeValue(n, highlight){
@@ -208,6 +221,7 @@ Y4.draw = {
     }
     if (line && line.v !== undefined) s += `<line x1="${2 + line.v * S}" y1="0" x2="${2 + line.v * S}" y2="${rows * S + 4}" class="sym-line"/>`;
     if (line && line.h !== undefined) s += `<line x1="0" y1="${2 + line.h * S}" x2="${cols * S + 4}" y2="${2 + line.h * S}" class="sym-line"/>`;
+    if (line && line.d) s += `<line x1="0" y1="0" x2="${cols * S + 4}" y2="${rows * S + 4}" class="sym-line"/>`;   // corner to corner
     return `<div class="gshape" style="max-width:${Math.min(cols * S * 1.3, 440)}px"><svg viewBox="0 0 ${cols * S + 4} ${rows * S + 4}">${s}</svg></div>`;
   },
   /* a coordinate grid from 0 to n. points: [{x, y, label}]; lines: [[x1,y1,x2,y2]]; tap: every crossing can be tapped */
@@ -282,6 +296,51 @@ Y4.draw = {
   /* a simple table: head is the first row, rows below; cells can be HTML */
   table(head, rows){
     return `<table class="dtable"><tr>${head.map(h => `<th>${h}</th>`).join("")}</tr>${rows.map(r => `<tr>${r.map((c, i) => i ? `<td>${c}</td>` : `<th>${c}</th>`).join("")}</tr>`).join("")}</table>`;
+  },
+  /* a chart the child draws on: values[i] is a number (already drawn) or null (to be drawn by tapping).
+     o: {step, max, kind:"bar"|"line", title, yLabel}. Heights are counted in steps (data-h = 1 … max/step). */
+  makeChart(labels, values, o){
+    const n = labels.length, H = 260, top = o.title ? 58 : 34, left = 54, cw = 90, W = left + n * cw + 10, base = top + H, k = o.max / o.step, sh = H / k;   // room for the ✏️ marks under the title
+    const y = v => base - v / o.max * H, line = o.kind === "line";
+    let s = o.title ? `<text x="${W / 2}" y="20" class="ch-title">${o.title}</text>` : "";
+    for (let v = 0; v <= o.max; v += o.step)
+      s += `<line x1="${left}" y1="${y(v)}" x2="${W - 6}" y2="${y(v)}" class="ch-grid"/><text x="${left - 8}" y="${y(v) + 5}" class="ch-num" style="text-anchor:end">${v}</text>`;
+    labels.forEach((l, i) => {
+      const cx = left + i * cw + cw / 2, bw = 56;
+      if (line) s += `<line x1="${cx}" y1="${top}" x2="${cx}" y2="${base}" class="ch-grid"/>`;
+      if (values[i] !== null){
+        s += line ? `<circle cx="${cx}" cy="${y(values[i])}" r="7" class="ch-pt"/>`
+                  : `<rect x="${cx - bw / 2}" y="${y(values[i])}" width="${bw}" height="${base - y(values[i])}" class="ch-bar"/>`;
+      } else {
+        for (let h = 1; h <= k; h++){
+          const y0 = base - h * sh;
+          s += `<g class="seg ${line ? "pt" : ""}" data-col="${l}" data-h="${h}">
+            <rect x="${cx - cw / 2 + 2}" y="${y0}" width="${cw - 4}" height="${sh}" class="seg-hit"/>
+            <rect x="${cx - bw / 2}" y="${y0}" width="${bw}" height="${sh}" class="seg-bar"/>
+            <circle cx="${cx}" cy="${y0}" r="8" class="seg-pt"/></g>`;
+        }
+        s += `<text x="${cx}" y="${top - 8}" class="ch-num" style="text-anchor:middle">✏️</text>`;
+      }
+      s += `<text x="${cx}" y="${base + 22}" class="ch-lab">${l}</text>`;
+    });
+    s += `<line x1="${left}" y1="${top - 6}" x2="${left}" y2="${base}" class="ch-axis"/><line x1="${left}" y1="${base}" x2="${W - 6}" y2="${base}" class="ch-axis"/>`;
+    if (o.yLabel) s += `<text x="14" y="${top + H / 2}" class="ch-ylab" transform="rotate(-90 14 ${top + H / 2})">${o.yLabel}</text>`;
+    return `<div class="chart make"><svg viewBox="0 0 ${W} ${base + 34}">${s}</svg></div>`;
+  },
+  /* a ruler from 0 to `cm` with an object lying from `from` to `to` (in cm, to 0.1) */
+  ruler(cm, from, to, thing){
+    const k = 40, pad = 20, W = cm * k + 2 * pad, x = v => pad + v * k;
+    let s = `<rect x="${pad - 10}" y="60" width="${cm * k + 20}" height="60" rx="6" class="ru-body"/>`;
+    for (let i = 0; i <= cm * 10; i++){
+      const big = i % 10 === 0, mid = i % 5 === 0;
+      s += `<line x1="${x(i / 10)}" y1="60" x2="${x(i / 10)}" y2="${60 + (big ? 24 : mid ? 16 : 10)}" class="ru-tick"/>`;
+      if (big) s += `<text x="${x(i / 10)}" y="104" class="ru-num">${i / 10}</text>`;
+    }
+    const icon = thing === "pencil"
+      ? `<rect x="${x(from)}" y="28" width="${(to - from) * k - 18}" height="22" rx="3" class="ru-obj"/><path d="M${x(to) - 18},28 L${x(to)},39 L${x(to) - 18},50 Z" class="ru-tip"/>`
+      : `<rect x="${x(from)}" y="28" width="${(to - from) * k}" height="22" rx="6" class="ru-obj"/>`;
+    s += icon + `<line x1="${x(from)}" y1="24" x2="${x(from)}" y2="60" class="ru-guide"/><line x1="${x(to)}" y1="24" x2="${x(to)}" y2="60" class="ru-guide"/>`;
+    return `<div class="ruler"><svg viewBox="0 0 ${W} 124" aria-hidden="true">${s}</svg></div>`;
   },
   /* a place value chart with decimals (T O . t h), one row per number, e.g. to show ÷ 10 */
   decimalChart(rows){

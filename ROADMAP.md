@@ -74,6 +74,7 @@ Each skill is one small **generator** that returns a new question each time:
 | Time (`input:"time"`): type 7:45 with a colon key; `any12:true` also accepts 19:45 | time |
 | Multiple choice (2–4 big buttons) | shape names, angle types, comparing |
 | Tap the picture (`input:"tap"` for one place, `input:"cells"` to colour squares then Check) | coordinates, symmetry, chart questions |
+| Draw a chart (`input:"bars"` with `Y4.draw.makeChart`): tap a column to set its height, then Check | making bar charts and time graphs |
 
 **How the child improves over time.** This is the same idea that already works in *Tricky Facts*:
 - Every skill has **3 levels**, e.g. rounding to 10 → 100 → 1000.
@@ -150,6 +151,19 @@ first because most other topics depend on them.
 - [x] Curriculum map: every line of `year4_maths_curriculum.md`, coloured not started / learning / mastered (`shared/curriculum.js`)
 - [x] Daily mix and a daily streak 🔥
 - [x] Parent view: time spent, weakest skills, and progress over the weeks
+
+### Phase 9 – Fill the gaps found against the official programme of study ✅
+Checked every statutory Year 4 statement on GOV.UK; `year4_maths_curriculum.md` now lists all 42 of them.
+- [x] Number lines: read, estimate and place numbers (Number lines skill)
+- [x] Number and practical problems (Number problems skill)
+- [x] Roman numerals and the history of zero and place value
+- [x] Mental maths with derived facts (60 × 4, 2400 ÷ 6) and commutativity
+- [x] Multiply-and-add problems: distributive law, scaling, correspondence
+- [x] Tenths ÷ 10 make hundredths
+- [x] Estimating measures, and measuring with a ruler
+- [x] Perimeter in metres as well as centimetres
+- [x] Lines of symmetry in different orientations (turned shapes, slanting mirror lines)
+- [x] Presenting data: drawing bar charts and plotting time graphs (Make a chart skill, `input:"bars"`)
 
 ### Ideas for later
 - [ ] Division facts in the Times Tables progress grid

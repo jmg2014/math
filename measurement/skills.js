@@ -89,47 +89,48 @@ const perimeter = {
   id:"me-perimeter", name:"Perimeter", emoji:"📐",
   desc:"The perimeter is the distance all the way round the edge of a shape. Add up the lengths of all the sides.",
   levels:[
-    { name:"Rectangles on squares", desc:"Count the sides of the squares round the edge" },
+    { name:"Rectangles on squares", desc:"Count the sides of the squares round the edge (in cm or m)" },
     { name:"Other shapes on squares", desc:"L shapes, T shapes and steps" },
-    { name:"Using lengths", desc:"A rectangle 12 cm by 7 cm · L shapes · find a missing side" }
+    { name:"Using lengths", desc:"A garden 12 m by 7 m · L shapes · find a missing side" }
   ],
   make(lv){
-    const each = "Each square is 1 cm long.";
+    const u = Math.random() < .4 ? "m" : "cm";      // centimetres and metres (a garden, a playground…)
+    const each = `Each square is 1 ${u} long.`;
     if (lv === 1){
       const w = rnd(2, 7), h = rnd(2, 5), p = 2 * (w + h);
-      return { text:`${each} What is the perimeter of the rectangle?`, picture:onGrid(rectCells(w, h), w, h), answer:p, suffix:" cm", key:`r${w}x${h}`,
-        explain:`<b>${p} cm</b><span class="why">${w} + ${h} + ${w} + ${h} = ${p}</span>`, solution:`${w} cm by ${h} cm rectangle: perimeter ${p} cm` };
+      return { text:`${each} What is the perimeter of the rectangle?`, picture:onGrid(rectCells(w, h), w, h), answer:p, suffix:` ${u}`, key:`r${w}x${h}`,
+        explain:`<b>${p} ${u}</b><span class="why">${w} + ${h} + ${w} + ${h} = ${p}</span>`, solution:`${w} ${u} by ${h} ${u} rectangle: perimeter ${p} ${u}` };
     }
     if (lv === 2){
       const { cells, w, h } = rectilinear(), p = perimeterOf(cells);
-      return { text:`${each} What is the perimeter of the shape?`, picture:onGrid(cells, w, h), answer:p, suffix:" cm", key:JSON.stringify(cells),
-        explain:`<b>${p} cm</b><span class="why">Count every square side on the thick edge. Mark where you start so you don't count any twice.</span>`,
-        solution:`Perimeter ${p} cm` };
+      return { text:`${each} What is the perimeter of the shape?`, picture:onGrid(cells, w, h), answer:p, suffix:` ${u}`, key:JSON.stringify(cells),
+        explain:`<b>${p} ${u}</b><span class="why">Count every square side on the thick edge. Mark where you start so you don't count any twice.</span>`,
+        solution:`Perimeter ${p} ${u}` };
     }
     const form = rnd(1, 4);
     if (form === 1){
       const l = rnd(5, 25), w = rnd(2, l - 1), p = 2 * (l + w);
-      return { text:"What is the perimeter of the rectangle?", picture:Y4.draw.labelledShape([[0, 0], [l, 0], [l, w], [0, w]], [`${l} cm`, `${w} cm`, null, null]),
-        answer:p, suffix:" cm", key:`R${l}x${w}`,
-        explain:`<b>${p} cm</b><span class="why">Opposite sides of a rectangle are the same: ${l} + ${w} + ${l} + ${w} = ${p}</span>`, solution:`${l} cm by ${w} cm: perimeter ${p} cm` };
+      return { text:"What is the perimeter of the rectangle?", picture:Y4.draw.labelledShape([[0, 0], [l, 0], [l, w], [0, w]], [`${l} ${u}`, `${w} ${u}`, null, null]),
+        answer:p, suffix:` ${u}`, key:`R${l}x${w}`,
+        explain:`<b>${p} ${u}</b><span class="why">Opposite sides of a rectangle are the same: ${l} + ${w} + ${l} + ${w} = ${p}</span>`, solution:`${l} ${u} by ${w} ${u}: perimeter ${p} ${u}` };
     }
     if (form === 2){
       const s = rnd(3, 15);
-      return { text:`A square has sides of ${s} cm. What is its perimeter?`, answer:4 * s, suffix:" cm", key:`sq${s}`,
-        explain:`<b>${4 * s} cm</b><span class="why">A square has 4 equal sides: 4 × ${s} = ${4 * s}</span>`, solution:`4 × ${s} = ${4 * s} cm` };
+      return { text:`A square has sides of ${s} ${u}. What is its perimeter?`, answer:4 * s, suffix:` ${u}`, key:`sq${s}`,
+        explain:`<b>${4 * s} ${u}</b><span class="why">A square has 4 equal sides: 4 × ${s} = ${4 * s}</span>`, solution:`4 × ${s} = ${4 * s} ${u}` };
     }
     if (form === 3){
       const L = lShape(), { W, H, cw, ch } = L, p = 2 * (W + H);
       return { text:"What is the perimeter of the shape? (Not drawn to scale.)", long:true,
-        picture:Y4.draw.labelledShape(L.points, [null, `${ch} cm`, [`${cw} cm`, "in"], null, `${W} cm`, `${H} cm`]), answer:p, suffix:" cm", key:`L${W}/${H}/${cw}/${ch}`,
-        explain:`<b>${p} cm</b><span class="why">First find the missing sides: top = ${W} − ${cw} = ${W - cw} cm, right = ${H} − ${ch} = ${H - ch} cm.<br>` +
-                `Then add all six: ${W - cw} + ${ch} + ${cw} + ${H - ch} + ${W} + ${H} = ${p}</span>`, solution:`L shape: perimeter ${p} cm` };
+        picture:Y4.draw.labelledShape(L.points, [null, `${ch} ${u}`, [`${cw} ${u}`, "in"], null, `${W} ${u}`, `${H} ${u}`]), answer:p, suffix:` ${u}`, key:`L${W}/${H}/${cw}/${ch}`,
+        explain:`<b>${p} ${u}</b><span class="why">First find the missing sides: top = ${W} − ${cw} = ${W - cw} ${u}, right = ${H} − ${ch} = ${H - ch} ${u}.<br>` +
+                `Then add all six: ${W - cw} + ${ch} + ${cw} + ${H - ch} + ${W} + ${H} = ${p}</span>`, solution:`L shape: perimeter ${p} ${u}` };
     }
     const l = rnd(4, 20), w = rnd(2, l), p = 2 * (l + w);
-    return { text:`A rectangle has a perimeter of ${p} cm. One side is ${l} cm long. How long is the shorter side?`.replace("the shorter side", l === w ? "the other side" : w < l ? "the shorter side" : "the longer side"),
-      answer:w, suffix:" cm", key:`P${p}/${l}`,
-      explain:`<b>${w} cm</b><span class="why">Two sides of ${l} cm make ${2 * l} cm. ${p} − ${2 * l} = ${2 * w} cm for the other two sides, so each is ${2 * w} ÷ 2 = ${w} cm</span>`,
-      solution:`${l} + ${w} + ${l} + ${w} = ${p} cm` };
+    return { text:`A rectangle has a perimeter of ${p} ${u}. One side is ${l} ${u} long. How long is the shorter side?`.replace("the shorter side", l === w ? "the other side" : w < l ? "the shorter side" : "the longer side"),
+      answer:w, suffix:` ${u}`, key:`P${p}/${l}`,
+      explain:`<b>${w} ${u}</b><span class="why">Two sides of ${l} ${u} make ${2 * l} ${u}. ${p} − ${2 * l} = ${2 * w} ${u} for the other two sides, so each is ${2 * w} ÷ 2 = ${w} ${u}</span>`,
+      solution:`${l} + ${w} + ${l} + ${w} = ${p} ${u}` };
   }
 };
 
@@ -284,6 +285,51 @@ const moneySkill = {
   }
 };
 
+/* ---------- Estimate and measure ---------- */
+// [thing, sensible estimate, silly ones]
+const LENGTHS = [
+  ["a pencil", "15 cm", ["15 m", "15 mm", "1 km"]], ["the height of a door", "2 m", ["2 cm", "20 m", "2 km"]],
+  ["a football pitch", "100 m", ["100 cm", "10 km", "1 m"]], ["a bus", "10 m", ["10 cm", "100 m", "1 km"]],
+  ["a ladybird", "8 mm", ["8 cm", "8 m", "80 cm"]], ["a classroom", "8 m", ["8 cm", "80 m", "8 km"]],
+  ["a walk of one hour", "5 km", ["5 m", "50 km", "5 cm"]], ["a child's shoe", "20 cm", ["20 m", "2 mm", "2 m"]],
+  ["a bed", "2 m", ["20 cm", "20 m", "2 km"]], ["a grain of rice", "5 mm", ["5 cm", "5 m", "50 cm"]]
+];
+const OTHERS = [
+  ["the mass of an apple", "100 g", ["100 kg", "1 g", "10 kg"]], ["the mass of a bag of sugar", "1 kg", ["1 g", "100 kg", "10 g"]],
+  ["the mass of a Year 4 child", "30 kg", ["30 g", "300 kg", "3 kg"]], ["the mass of a car", "1000 kg", ["10 kg", "100 g", "1 kg"]],
+  ["the mass of a paperclip", "1 g", ["1 kg", "100 g", "10 kg"]], ["what a teaspoon holds", "5 ml", ["5 l", "500 ml", "50 l"]],
+  ["what a cup holds", "250 ml", ["250 l", "2 ml", "25 l"]], ["what a bath holds", "100 l", ["100 ml", "1 l", "10 ml"]],
+  ["what a bucket holds", "10 l", ["10 ml", "100 l", "1 ml"]], ["how long it takes to brush your teeth", "2 minutes", ["2 seconds", "2 hours", "2 days"]],
+  ["how long a school day lasts", "6 hours", ["6 minutes", "6 days", "60 hours"]], ["how long a blink takes", "less than 1 second", ["1 minute", "1 hour", "10 minutes"]],
+  ["how long the summer holiday lasts", "6 weeks", ["6 days", "6 months", "6 hours"]]
+];
+const estimate = {
+  id:"me-estimate", name:"Estimate and measure", emoji:"📐",
+  desc:"Get to know some benchmarks: a door is about 2 m tall, a bag of sugar is 1 kg, a cup holds about 250 ml. To measure with a ruler, line the end up with 0, or count the cm between the two ends.",
+  levels:[
+    { name:"Estimate lengths", desc:"Is a pencil about 15 cm, 15 m or 15 mm?" },
+    { name:"Estimate mass, capacity and time", desc:"An apple · a bath · brushing your teeth" },
+    { name:"Measure with a ruler", desc:"How long is the pencil, in cm or mm?" }
+  ],
+  make(lv){
+    if (lv < 3){
+      const [thing, right, wrong] = pick(lv === 1 ? LENGTHS : OTHERS);
+      const ask = lv === 1 ? `What is the best estimate for the length of ${thing}?` : `What is the best estimate for ${thing}?`;
+      return { text:ask, input:"choice", choices:shuffle([right, ...wrong]), answer:right, key:thing,
+        explain:`<b>${right}</b><span class="why">Benchmarks: 1 cm is about the width of your finger, 1 m is a big step, 1 kg is a bag of sugar, 1 litre is a big bottle of water.</span>`,
+        solution:`${thing}: about ${right}` };
+    }
+    const thing = pick(["pencil", "bar"]), cm = 15, mm = Math.random() < .5;
+    let from, to;
+    do { from = Math.random() < .5 ? 0 : rnd(1, 4); to = from + (mm ? rnd(25, 110) / 10 : rnd(3, 11)); } while (to > cm - .5);
+    to = +to.toFixed(1);
+    const len = +(to - from).toFixed(1), ans = mm ? Math.round(len * 10) : len;
+    return { text:`How long is the ${thing === "pencil" ? "pencil" : "ribbon"}, in ${mm ? "millimetres" : "centimetres"}?`, picture:Y4.draw.ruler(cm, from, to, thing), answer:ans, suffix:mm ? " mm" : " cm", key:`ru${from}-${to}${mm}`,
+      explain:`<b>${ans} ${mm ? "mm" : "cm"}</b><span class="why">${from ? `It starts at ${from} cm, not 0, so count from there: ${to} − ${from} = ${len} cm.` : `It starts at 0 and ends at ${to} cm.`}${mm ? ` 1 cm = 10 mm, so ${len} cm = ${ans} mm.` : ""}</span>`,
+      solution:`${from} cm to ${to} cm = ${mm ? ans + " mm" : len + " cm"}` };
+  }
+};
+
 Y4.TOPICS.push({ id:"measurement", title:"Measurement", emoji:"📏",
-  skills:[convert, perimeter, area, time, moneySkill] });
+  skills:[convert, estimate, perimeter, area, time, moneySkill] });
 })();

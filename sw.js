@@ -1,8 +1,8 @@
 // Offline support: keeps a copy of the whole app on the device.
-// Opens from the saved copy straight away, and quietly fetches any update in the background
-// (the update shows the next time the app is opened).
+// When online, every file is fetched fresh (so new and old files never get mixed after an update),
+// and the saved copy is refreshed. When offline, the saved copy is used.
 // When you add a file, add it to FILES and change the number in CACHE.
-const CACHE = "year4-maths-v4";
+const CACHE = "year4-maths-v5";
 const FILES = [
   "./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png",
   "./shared/style.css", "./shared/progress.js", "./shared/engine.js", "./shared/draw.js", "./shared/topic.js",
@@ -14,7 +14,10 @@ const FILES = [
 ];
 
 self.addEventListener("install", e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
+  // cache: "reload" skips the browser's own cache, so the saved copy is all from the same version
+  e.waitUntil(caches.open(CACHE)
+    .then(c => c.addAll(FILES.map(f => new Request(f, { cache:"reload" }))))
+    .then(() => self.skipWaiting()));
 });
 
 self.addEventListener("activate", e => {
@@ -28,12 +31,12 @@ self.addEventListener("activate", e => {
 self.addEventListener("fetch", e => {
   if (e.request.method !== "GET" || new URL(e.request.url).origin !== location.origin) return;
   e.respondWith(
-    caches.open(CACHE).then(async cache => {
-      const cached = await cache.match(e.request, { ignoreSearch: true });
-      const fresh = fetch(e.request)
-        .then(res => { if (res.ok) cache.put(e.request, res.clone()); return res; })
-        .catch(() => cached);
-      return cached || fresh;
-    })
+    // "no-cache" asks the server whether the file changed (a quick check), so updates show at once
+    fetch(e.request, { cache:"no-cache" })
+      .then(res => {
+        if (res.ok){ const copy = res.clone(); caches.open(CACHE).then(c => c.put(e.request, copy)); }
+        return res;
+      })
+      .catch(() => caches.match(e.request, { ignoreSearch:true }))
   );
 });

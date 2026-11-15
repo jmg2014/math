@@ -71,8 +71,8 @@ The whole `math` folder is the website. Publish everything in it, keeping the fo
 
 After the first visit, the tablet keeps its own copy of the app, so it works **with no Wi-Fi and without this computer**.
 
-**Updating the app later:** upload the changed files again. The tablet picks up the new version the next time
-it's opened while online, and shows it the time after that.
+**Updating the app later:** push or upload the changed files again. Whenever the tablet is online it loads the
+newest version straight away; offline, it uses its saved copy.
 
 **Is it private?** On a free account, the website is public, but nobody finds it unless you share the link.
 It contains nothing personal: the child's progress stays on the tablet and is never uploaded.

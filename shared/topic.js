@@ -68,7 +68,14 @@ function makeRound(skill, lv){
 }
 
 function start(skill, lv){
-  Y4.startSession({ title:`${skill.name} · Level ${lv}`, questions:makeRound(skill, lv), feedback:true,
+  let questions;
+  try { questions = makeRound(skill, lv); }
+  catch(e){    // usually old and new files mixed up after an update: say so instead of doing nothing
+    $("#skillPanel").insertAdjacentHTML("afterbegin",
+      `<p class="feedback bad" style="margin-top:0">Sorry, this page needs updating. Close the app completely and open it again while on Wi-Fi.</p>`);
+    return;
+  }
+  Y4.startSession({ title:`${skill.name} · Level ${lv}`, questions, feedback:true,
     requeue:true, maxQ:ROUND + 4, waitOnWrong:true, okDelay:900,
     onAnswer:(q, ok) => P.record(skill.id, ok),
     onFinish:res => finish(skill, lv, res) });

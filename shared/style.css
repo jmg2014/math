@@ -228,3 +228,36 @@ h3{font-size:1.05rem;margin:1.2em 0 .5em}
 .cg-tap.picked,.cg-tap.wrongpick{fill:var(--bad);opacity:.85}
 .cg-tap.right{fill:var(--good);opacity:.9}
 .cg-tap.picked.right{fill:var(--good)}
+
+/* charts, pictograms, tallies and tables */
+.chart{width:100%;max-width:520px;margin:0 auto}
+.chart svg{width:100%;height:auto;display:block}
+.ch-title{fill:var(--ink);color:var(--ink);font-size:17px;font-weight:800;text-anchor:middle;text-align:center;margin-bottom:6px}
+.ch-grid{stroke:var(--line);stroke-width:1.5}
+.ch-axis{stroke:var(--ink);stroke-width:3}
+.ch-num{fill:var(--muted);font-size:15px;font-weight:700}
+.ch-lab{fill:var(--ink);font-size:15px;font-weight:700;text-anchor:middle}
+.ch-ylab{fill:var(--muted);font-size:14px;font-weight:700;text-anchor:middle}
+.ch-bar{fill:var(--accent);opacity:.85}
+.ch-tap{cursor:pointer}
+.ch-bar.picked,.ch-bar.wrongpick{fill:var(--bad);opacity:1}
+.ch-bar.right{fill:var(--good);opacity:1}
+.ch-line{fill:none;stroke:var(--accent);stroke-width:4}
+.ch-pt{fill:var(--accent);stroke:var(--card);stroke-width:2}
+.picto{display:inline-block;background:var(--card);border:2px solid var(--line);border-radius:16px;padding:10px 14px;text-align:left}
+.picto table{border-collapse:collapse}
+.picto th{text-align:left;padding:4px 12px 4px 0;font-size:1.05rem;color:var(--ink)}
+.picto td{padding:4px 0;white-space:nowrap}
+.pi{display:inline-block;font-size:1.7rem;line-height:1.2;width:1.25em;text-align:center}
+.pi.half{width:.62em;overflow:hidden;text-align:left;vertical-align:bottom}
+.pi.half span{display:inline-block;width:1.25em;text-align:center}
+.pkey{margin-top:6px;font-weight:700;color:var(--muted);border-top:2px solid var(--line);padding-top:4px}
+.pkey .pi{font-size:1.3rem}
+.tally{height:34px;vertical-align:middle;margin-right:8px}
+.ta{stroke:var(--ink);stroke-width:2.6;stroke-linecap:round}
+.dtable{border-collapse:separate;border-spacing:0;margin:0 auto;background:var(--card);border:2px solid var(--line);border-radius:14px;overflow:hidden;font-size:1.1rem}
+.dtable th,.dtable td{padding:7px 14px;border-bottom:1px solid var(--line);text-align:center}
+.dtable tr:last-child th,.dtable tr:last-child td{border-bottom:none}
+.dtable tr:first-child th{background:var(--key);color:var(--ink)}
+.dtable th{text-align:left;color:var(--ink)}
+.dtable td{font-weight:700;font-variant-numeric:tabular-nums}

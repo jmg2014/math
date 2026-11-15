@@ -14,7 +14,7 @@ See [ROADMAP.md](ROADMAP.md) for what is built and what comes next.
 | 🍕 Fractions & Decimals | `fractions/` | ✅ Built |
 | 📏 Measurement | `measurement/` | ✅ Built |
 | 🔷 Shapes & Position | `shapes/` | ✅ Built |
-| 📊 Statistics | – | 🚧 Coming soon |
+| 📊 Statistics | `statistics/` | ✅ Built |
 
 ---
 
@@ -192,6 +192,17 @@ When reading a clock, both 7:45 and 19:45 count.
 
 **Tapping answers:** some questions are answered by tapping the picture: a point on the grid, or squares to colour
 (tap again to clear a square, then press **Check ✓**). Afterwards, green shows the right answer and red shows a mistake.
+
+## 📊 Statistics
+
+All the charts and tables are made up at random, so there's always new data to read.
+
+| Skill | Level 1 | Level 2 | Level 3 |
+|---|---|---|---|
+| 📊 Bar charts | Read bars (scales in 1s and 2s) · tap the most popular | Scales in 2s, 5s and 10s (halfway readings) · how many more? | How many altogether? · "X or Y" · two-step questions |
+| 🍎 Pictograms | Each picture = 2, with half pictures | Each picture = 4 or 10 · how many more? | Totals · how many pictures would show 40? |
+| 📋 Tally charts and tables | Count tally marks | Tables: how many more? altogether? most popular? | Two-way tables: boys and girls |
+| 📈 Time graphs | Read a value at a time | How much did it rise? · when was it highest? | When did it rise the most? · when was it 15°C? |
 
 ---
 

@@ -142,9 +142,9 @@ first because most other topics depend on them.
 - [x] Lines of symmetry, and completing a symmetric shape on a grid
 - [x] Plot and read coordinates, and describe moves ("3 right, 2 up")
 
-### Phase 7 – Statistics
-- [ ] Bar charts, pictograms, tables and time graphs, drawn from random data
-- [ ] "How many more?", "Which is the most?" and "What is the total?" questions
+### Phase 7 – Statistics ✅
+- [x] Bar charts, pictograms, tables and time graphs, drawn from random data
+- [x] "How many more?", "Which is the most?" and "What is the total?" questions
 
 ### Phase 8 – Main page extras
 - [ ] Division facts in the Times Tables progress grid

@@ -230,6 +230,59 @@ Y4.draw = {
     });
     return `<div class="cgrid"><svg viewBox="0 0 ${W} ${H}">${s}</svg></div>`;
   },
+  /* a bar chart. labels, values; o: {step (gridline gap), max, title, yLabel, tap (bars can be tapped)} */
+  barChart(labels, values, o){
+    const n = labels.length, H = 260, top = 34, left = 54, bw = 64, gap = 26, W = left + n * (bw + gap) + 10, base = top + H;
+    const y = v => base - v / o.max * H;
+    let s = o.title ? `<text x="${W / 2}" y="20" class="ch-title">${o.title}</text>` : "";
+    for (let v = 0; v <= o.max; v += o.step)
+      s += `<line x1="${left}" y1="${y(v)}" x2="${W - 6}" y2="${y(v)}" class="ch-grid"/><text x="${left - 8}" y="${y(v) + 5}" class="ch-num" style="text-anchor:end">${v}</text>`;
+    labels.forEach((l, i) => {
+      const x = left + gap / 2 + i * (bw + gap);
+      s += `<rect x="${x}" y="${y(values[i])}" width="${bw}" height="${base - y(values[i])}" class="ch-bar ${o.tap ? "ch-tap" : ""}" ${o.tap ? `data-tap="${l}"` : ""}/>`;
+      s += `<text x="${x + bw / 2}" y="${base + 22}" class="ch-lab">${l}</text>`;
+    });
+    s += `<line x1="${left}" y1="${top - 6}" x2="${left}" y2="${base}" class="ch-axis"/><line x1="${left}" y1="${base}" x2="${W - 6}" y2="${base}" class="ch-axis"/>`;
+    if (o.yLabel) s += `<text x="14" y="${top + H / 2}" class="ch-ylab" transform="rotate(-90 14 ${top + H / 2})">${o.yLabel}</text>`;
+    return `<div class="chart"><svg viewBox="0 0 ${W} ${base + 34}">${s}</svg></div>`;
+  },
+  /* a line graph over time. xs (labels), ys; o: {step, max, min, title, yLabel} */
+  lineGraph(xs, ys, o){
+    const n = xs.length, H = 250, top = 34, left = 54, dx = 70, W = left + (n - 1) * dx + 62, base = top + H, min = o.min || 0;
+    const X = i => left + 24 + i * dx, Y = v => base - (v - min) / (o.max - min) * H;
+    let s = o.title ? `<text x="${W / 2}" y="20" class="ch-title">${o.title}</text>` : "";
+    for (let v = min; v <= o.max; v += o.step)
+      s += `<line x1="${left}" y1="${Y(v)}" x2="${W - 6}" y2="${Y(v)}" class="ch-grid"/><text x="${left - 8}" y="${Y(v) + 5}" class="ch-num" style="text-anchor:end">${v}</text>`;
+    xs.forEach((l, i) => { s += `<line x1="${X(i)}" y1="${top}" x2="${X(i)}" y2="${base}" class="ch-grid"/><text x="${X(i)}" y="${base + 22}" class="ch-lab">${l}</text>`; });
+    s += `<polyline points="${ys.map((v, i) => `${X(i)},${Y(v)}`).join(" ")}" class="ch-line"/>`;
+    ys.forEach((v, i) => { s += `<circle cx="${X(i)}" cy="${Y(v)}" r="6" class="ch-pt"/>`; });
+    s += `<line x1="${left}" y1="${top - 6}" x2="${left}" y2="${base}" class="ch-axis"/><line x1="${left}" y1="${base}" x2="${W - 6}" y2="${base}" class="ch-axis"/>`;
+    if (o.yLabel) s += `<text x="14" y="${top + H / 2}" class="ch-ylab" transform="rotate(-90 14 ${top + H / 2})">${o.yLabel}</text>`;
+    return `<div class="chart"><svg viewBox="0 0 ${W} ${base + 34}">${s}</svg></div>`;
+  },
+  /* a pictogram: rows [[label, value]], each icon is worth `per`; a half icon shows half of that */
+  pictogram(rows, icon, per, title){
+    const icons = v => { let h = ""; for (let i = 0; i < Math.floor(v / per); i++) h += `<span class="pi">${icon}</span>`;
+      if (v % per) h += `<span class="pi half"><span>${icon}</span></span>`; return h; };
+    return `<div class="picto">${title ? `<div class="ch-title">${title}</div>` : ""}<table>${rows.map(([l, v]) => `<tr><th>${l}</th><td>${icons(v)}</td></tr>`).join("")}</table>
+      <div class="pkey">Key: <span class="pi">${icon}</span> = ${per}</div></div>`;
+  },
+  /* tally marks for n: bundles of five (four lines crossed by a fifth) */
+  tally(n){
+    let h = "";
+    for (let g = 0; g < Math.ceil(n / 5); g++){
+      const k = Math.min(5, n - g * 5);
+      let s = "";
+      for (let i = 0; i < Math.min(k, 4); i++) s += `<line x1="${6 + i * 9}" y1="4" x2="${6 + i * 9}" y2="32" class="ta"/>`;
+      if (k === 5) s += `<line x1="1" y1="28" x2="38" y2="8" class="ta"/>`;
+      h += `<svg viewBox="0 0 ${k === 5 ? 40 : 8 + Math.min(k, 4) * 9} 36" class="tally" style="width:${(k === 5 ? 40 : 8 + Math.min(k, 4) * 9) * .9}px">${s}</svg>`;
+    }
+    return h;
+  },
+  /* a simple table: head is the first row, rows below; cells can be HTML */
+  table(head, rows){
+    return `<table class="dtable"><tr>${head.map(h => `<th>${h}</th>`).join("")}</tr>${rows.map(r => `<tr>${r.map((c, i) => i ? `<td>${c}</td>` : `<th>${c}</th>`).join("")}</tr>`).join("")}</table>`;
+  },
   /* a place value chart with decimals (T O . t h), one row per number, e.g. to show ÷ 10 */
   decimalChart(rows){
     const cols = ["T", "O", "t", "h"];

@@ -26,7 +26,8 @@ self.addEventListener("install", e => {
 self.addEventListener("activate", e => {
   e.waitUntil(
     caches.keys()
-      .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
+      // only this app's old copies: the Spanish app (lengua) shares this address and its offline storage
+      .then(keys => Promise.all(keys.filter(k => k.startsWith("year4-maths-") && k !== CACHE).map(k => caches.delete(k))))
       .then(() => self.clients.claim())
   );
 });

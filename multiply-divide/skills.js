@@ -124,7 +124,7 @@ function partials(a, m){
 }
 const written = {
   id:"md-written", name:"Written multiplication", emoji:"📝",
-  desc:"Multiply 2- and 3-digit numbers by a 1-digit number. Work it out on paper if you like, then type the answer.",
+  desc:"Multiply 2- and 3-digit numbers by a 1-digit number. Type the answer under the line, starting with the ones, just like on paper.",
   levels:[
     { name:"2-digit, no carrying", desc:"Like 32 × 3" },
     { name:"2-digit", desc:"Like 47 × 6" },
@@ -136,7 +136,7 @@ const written = {
     else if (lv === 2){ m = rnd(3,9); a = rnd(13, 99); }
     else { m = rnd(3,9); a = rnd(102, 999); }
     const p = a * m;
-    return { text:"", picture:Y4.draw.column(a, "×", m), answer:p, maxLen:4, key:`${a}x${m}`,
+    return { text:"", picture:Y4.draw.column(a, "×", m, 4), input:"column", answer:p, maxLen:4, key:`${a}x${m}`,
       explain:`${a} × ${m} = <b>${p}</b><span class="why">${partials(a, m)}</span>`, solution:`${a} × ${m} = ${p}` };
   }
 };

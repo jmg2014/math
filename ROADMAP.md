@@ -68,6 +68,7 @@ Each skill is one small **generator** that returns a new question each time:
 | Input | Used for |
 |---|---|
 | Number keypad, with a "Make it negative −" key when needed (`neg:true`) | most questions, including negative numbers |
+| Column sum (`input:"column"` with `Y4.draw.column`): digits typed ones first | written methods |
 | Fraction keypad (top / bottom) | sharing problems, equivalent fractions |
 | Decimal and money keypad (with `.` and `£`) | decimals, money |
 | Clock (drag the hands, or type a digital time) | time |
@@ -113,10 +114,10 @@ first because most other topics depend on them.
 - [x] Round to the nearest 10, 100 or 1000
 - [x] Roman numerals up to 100, both ways
 
-### Phase 3 – Addition & subtraction
-- [ ] Column addition and subtraction up to 4 digits, entered one column at a time
-- [ ] Estimate first, then check using the inverse
-- [ ] Two-step word problems (generated from templates: shop, bus, school trip…)
+### Phase 3 – Addition & subtraction ✅
+- [x] Column addition and subtraction up to 4 digits, entered one column at a time
+- [x] Estimate first, then check using the inverse
+- [x] Two-step word problems (generated from templates: shop, bus, school trip…)
 
 ### Phase 4 – Fractions & decimals
 - [ ] Equivalent fractions, with pictures

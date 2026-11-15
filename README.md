@@ -10,7 +10,8 @@ See [ROADMAP.md](ROADMAP.md) for what is built and what comes next.
 | ✖️ Times Tables | `times-tables/` | ✅ Built |
 | ➗ Multiplication & Division | `multiply-divide/` | ✅ Built |
 | 🔢 Number & Place Value | `number/` | ✅ Built |
-| ➕ Add & Subtract, 🍕 Fractions, 📏 Measurement, 🔷 Shapes, 📊 Statistics | – | 🚧 Coming soon |
+| ➕ Addition & Subtraction | `add-subtract/` | ✅ Built |
+| 🍕 Fractions, 📏 Measurement, 🔷 Shapes, 📊 Statistics | – | 🚧 Coming soon |
 
 ---
 
@@ -112,8 +113,11 @@ A wrong answer shows the working and waits for **Next ▶**. A similar question 
 | ➗ Division facts | ÷ 2, 3, 4, 5, 10 | ÷ any number to 12 | Missing numbers: □ ÷ 6 = 8 |
 | 🎲 × 0, × 1 and 3 numbers | 23 × 0, 37 ÷ 1, 12 ÷ 12 | 2 × 3 × 4 | 7 × 5 × 2 (pick the easy pair first) |
 | 🧩 Factor pairs | 6 × □ = 24 | Is 7 a factor of 42? | How many factor pairs does 36 have? |
-| 📝 Written multiplication | 32 × 3 (no carrying) | 47 × 6 | 347 × 6 |
+| 📝 Written multiplication | 32 × 3 (no carrying) | 47 × 6 | 347 × 6 (answer typed into the sum, ones first) |
 | 🍰 Sharing problems | 1 pizza between 4 → ¼ | 3 cakes between 10 → 3/10, with pictures | Word problems, working backwards |
+
+**Column sums** (written multiplication, column addition and subtraction): the answer is typed under the line,
+**ones first**, just like on paper. Each digit fills the next column to the left.
 
 **Fraction answers:** type the top number, then tap **Bottom number ⬇** (or Enter) and type the bottom number.
 Equal fractions count as right, so 2/4 is accepted for 1/2.
@@ -134,6 +138,17 @@ Works the same way as Multiplication & Division: one tab for each skill, 3 level
 
 **Negative answers:** type the number, then tap **Make it negative −**.
 Wrong answers show the working with a number line or a place value chart.
+
+## ➕ Addition & Subtraction
+
+| Skill | Level 1 | Level 2 | Level 3 |
+|---|---|---|---|
+| ➕ Column addition | 352 + 427 (up to one carry) | 2486 + 1357 | 3678 + 4859 (lots of carrying) |
+| ➖ Column subtraction | 684 − 352 (no exchanging) | 5263 − 1847 | 4003 − 1567 (zeros in the way) |
+| 🔍 Estimate and check | Round to the nearest 100 or 1000, then add or subtract | "Sam says 6008 + 3603 = 8611. Is Sam right?" | Which calculation checks it? · □ − 365 = 1240 |
+| 📖 Word problems | One step: add or subtract? | Two steps, 3-digit numbers | Two steps, 4-digit numbers |
+
+A wrong column sum shows the working column by column, with every carry and exchange.
 
 ---
 

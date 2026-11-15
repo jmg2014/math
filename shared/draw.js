@@ -32,15 +32,16 @@ Y4.draw = {
     for (let i = 0; i < count; i++) h += one(slices, share ? new Set([i % slices]) : new Set());
     return `<div class="pies">${h}</div>`;
   },
-  /* a sum laid out in columns, e.g. column(347, "×", 6) */
-  column(top, op, bottom){
-    const A = String(top), B = String(bottom), w = Math.max(A.length, B.length) + 1;
-    const row = (s, lead) => {
+  /* a sum laid out in columns, e.g. column(347, "×", 6, 4), with an empty answer row
+     `answerDigits` wide that the "column" input fills in */
+  column(top, op, bottom, answerDigits){
+    const A = String(top), B = String(bottom), w = Math.max(A.length, B.length, answerDigits || 0) + 1;
+    const row = (s, lead, cls) => {
       const cells = [];
       for (let i = 0; i < w - s.length; i++) cells.push(i === 0 && lead ? lead : "");
-      return `<div>${cells.concat(s.split("")).map(c => `<span>${c}</span>`).join("")}</div>`;
+      return `<div class="${cls || ""}">${cells.concat(s.split("")).map((c, i) => `<span class="${i === 0 && lead ? "op" : ""}">${c}</span>`).join("")}</div>`;
     };
-    return `<div class="colsum">${row(A)}${row(B, op)}</div>`;
+    return `<div class="colsum">${row(A)}${row(B, op, "u")}${row("".padStart(w - 1, " ").replace(/ /g, "\u200b"), "", "colans")}</div>`;
   },
   /* a number line from lo to hi with a tick every `step` (labelled every `labelEvery` ticks).
      points: [{ v, cls:"start"|"end"|"", label }] are drawn as dots, with an optional label above */

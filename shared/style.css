@@ -119,7 +119,12 @@ h3{font-size:1.05rem;margin:1.2em 0 .5em}
   background:var(--card);border:2px solid var(--line);border-radius:16px;padding:.2em .5em}
 .colsum div{display:flex;justify-content:flex-end}
 .colsum span{display:inline-block;width:.75em;text-align:center}
-.colsum div:last-child{border-bottom:.08em solid currentColor;padding-bottom:.05em}
+.colsum .u{border-bottom:.08em solid currentColor;padding-bottom:.05em;margin-bottom:.08em}
+.colsum span.op{margin-right:.2em}
+.colsum .colans span:first-child{margin-right:.2em}
+.colsum .colans span{color:var(--accent);min-height:1.15em}
+.colsum .colans span.cur{background:var(--key);border-radius:8px;box-shadow:inset 0 -.1em 0 var(--accent)}
+.colsum .colans.wrong span{color:var(--bad)}
 
 /* results */
 .res{text-align:center;max-width:720px;margin:0 auto}

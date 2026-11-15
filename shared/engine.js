@@ -4,7 +4,8 @@
    A question is an object:
      text      what is asked (HTML allowed)
      picture   optional HTML/SVG shown above it
-     input     "number" (default) | "fraction" | "choice"
+     input     "number" (default) | "fraction" | "choice" |
+               "column" (a number typed into a column sum from Y4.draw.column, ones first)
      answer    number, {n, d} for fractions, or the right choice text
      choices   list of texts, for input "choice"
      check     optional function(given) → true/false, to accept more than one answer
@@ -183,6 +184,15 @@ function renderAnswer(){
     el.innerHTML = `<span class="frac"><span data-part="n" class="${S.part === "n" ? "on" : ""}">${S.fn || "&nbsp;"}</span><i></i>` +
                    `<span data-part="d" class="${S.part === "d" ? "on" : ""}">${S.fd || "&nbsp;"}</span></span>`;
     $("#nextKey").textContent = S.part === "n" ? "Bottom number ⬇" : "⬆ Top number";
+  } else if (inputOf(q) === "column"){            // digits fill the answer row of the sum, from the right
+    const cells = [...document.querySelectorAll("#qpic .colans span")], a = S.answer;
+    cells.forEach((c, i) => {
+      const j = cells.length - 1 - i;                 // position counted from the right
+      c.textContent = j < a.length ? a[a.length - 1 - j] : "";
+      c.classList.toggle("cur", j === a.length && a.length < (q.maxLen || 3));
+    });
+    const row = document.querySelector("#qpic .colans");
+    if (row) row.classList.remove("wrong");
   } else {
     el.classList.remove("fracbox");
     el.textContent = (S.answer || S.neg) ? (S.neg ? "−" : "") + S.answer : " ";
@@ -238,7 +248,7 @@ function nextQuestion(){
   S.answer = ""; S.fn = ""; S.fd = ""; S.part = "n"; S.neg = false; S.choice = undefined;
   const ans = $("#answer");
   ans.style.visibility = "visible";
-  ans.style.display = mode === "choice" ? "none" : "";
+  ans.style.display = mode === "choice" || mode === "column" ? "none" : "";
   $("#pad").style.display = mode === "choice" ? "none" : "";
   $("#nextKey").style.display = mode === "fraction" || (mode === "number" && q.neg) ? "" : "none";
   const ch = $("#choices");
@@ -324,6 +334,8 @@ function submit(){
     fb.innerHTML = `${timedOut && given === null ? "⏰ Time's up! " : "✗ "}${q.explain}`;
     fb.className = "feedback bad"; badSound();
     $("#answer").classList.add("wrong");
+    const row = document.querySelector("#qpic .colans");
+    if (row){ row.classList.add("wrong"); row.querySelectorAll(".cur").forEach(c => c.classList.remove("cur")); }
     if (S.requeue && S.questions.length < S.maxQ){
       S.questions.splice(Math.min(S.questions.length, S.i + 4), 0, Object.assign({}, q, { retry:true }));
     }
@@ -357,10 +369,11 @@ function press(k){
     renderAnswer();
     return;
   }
-  if (k === "del") S.answer = S.answer.slice(0, -1);
+  const col = m === "column";                       // column sums are filled in from the right
+  if (k === "del") S.answer = col ? S.answer.slice(1) : S.answer.slice(0, -1);
   else if (k === "ok"){ if (S.answer !== "") submit(); return; }
   else if (k === "next"){ if (!q.neg) return; S.neg = !S.neg; }
-  else if (S.answer.length < (q.maxLen || 3)) S.answer += k;
+  else if (S.answer.length < (q.maxLen || 3)) S.answer = col ? k + S.answer : S.answer + k;
   renderAnswer();
 }
 function choose(i){
